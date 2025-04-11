@@ -13,7 +13,9 @@ export async function POST(req: Request) {
         const preferences = TravelPreferencesSchema.parse(input);
 
         // Generate plan
-        const { object: plan } = await service.generatePlan(preferences);
+        const plan = await service.generatePlan(preferences);
+
+        console.log('plaaa', plan);
 
         return NextResponse.json(plan);
     } catch (error) {

@@ -9,12 +9,12 @@ export const DiningRecommendationSchema = z.object({
 });
 
 export const DayItinerarySchema = z.object({
-    day: z.number().int().positive(),
+    day: z.number(),
     theme: z.string(),
     morning: z.array(z.string()),
     afternoon: z.array(z.string()),
     evening: z.array(z.string()),
-    dining: DiningRecommendationSchema,
+    dining: DiningRecommendationSchema
 });
 
 export const PackingCategorySchema = z.object({
@@ -22,13 +22,16 @@ export const PackingCategorySchema = z.object({
     items: z.array(z.string()),
     essential: z.boolean(),
 });
-// lib/ai/schemas.ts
+
 export const TravelPlanSchema = z.object({
     title: z.string(),
     summary: z.string(),
-    itinerary: z.array(
-        z.object({
-            day: z.number() // Remove all validators temporarily
-        })
-    )
+    itinerary: z.array(DayItinerarySchema), // Fixed array definition
+    packingList: z.array(PackingCategorySchema),
+    estimatedCost: z.object({
+        range: z.string(),
+        currency: z.string(),
+        breakdown: z.record(z.number()).optional()
+    }),
+    tips: z.array(z.string())
 });
