@@ -4,6 +4,11 @@ import { encodedRedirect } from "@/utils/utils";
 import { createClient } from "@/utils/supabase/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { PlaceSuggestion } from "@/components/google autocomplete/place_suggestion_types";
+import { DateRange } from "react-day-picker";
+import { generateObject, generateText } from "ai";
+import { openai } from "@ai-sdk/openai";
+import { systemPrompt } from "@/lib/utils";
 
 export const signUpAction = async (formData: FormData) => {
   const email = formData.get("email")?.toString();
@@ -15,7 +20,7 @@ export const signUpAction = async (formData: FormData) => {
     return encodedRedirect(
       "error",
       "/sign-up",
-      "Email and password are required",
+      "Email and password are required"
     );
   }
 
@@ -34,7 +39,7 @@ export const signUpAction = async (formData: FormData) => {
     return encodedRedirect(
       "success",
       "/sign-up",
-      "Thanks for signing up! Please check your email for a verification link.",
+      "Thanks for signing up! Please check your email for a verification link."
     );
   }
 };
@@ -75,7 +80,7 @@ export const forgotPasswordAction = async (formData: FormData) => {
     return encodedRedirect(
       "error",
       "/forgot-password",
-      "Could not reset password",
+      "Could not reset password"
     );
   }
 
@@ -86,7 +91,7 @@ export const forgotPasswordAction = async (formData: FormData) => {
   return encodedRedirect(
     "success",
     "/forgot-password",
-    "Check your email for a link to reset your password.",
+    "Check your email for a link to reset your password."
   );
 };
 
@@ -100,7 +105,7 @@ export const resetPasswordAction = async (formData: FormData) => {
     encodedRedirect(
       "error",
       "/protected/reset-password",
-      "Password and confirm password are required",
+      "Password and confirm password are required"
     );
   }
 
@@ -108,7 +113,7 @@ export const resetPasswordAction = async (formData: FormData) => {
     encodedRedirect(
       "error",
       "/protected/reset-password",
-      "Passwords do not match",
+      "Passwords do not match"
     );
   }
 
@@ -120,7 +125,7 @@ export const resetPasswordAction = async (formData: FormData) => {
     encodedRedirect(
       "error",
       "/protected/reset-password",
-      "Password update failed",
+      "Password update failed"
     );
   }
 
@@ -131,4 +136,57 @@ export const signOutAction = async () => {
   const supabase = await createClient();
   await supabase.auth.signOut();
   return redirect("/sign-in");
+};
+
+export const place_suggestion = async (query: string) => {
+  const supabase = await createClient();
+  const googleApiKey = process.env.GOOGLE_MAPS_API_KEY;
+  // const { data: session } = await supabase.auth.getSession();
+  // if (session.session) {
+  const { data: cachedSuggestions, error } = await supabase
+    .from("places_suggestions")
+    .select("suggestions")
+    .eq("query", query)
+    .single();
+
+  if (error) {
+    console.error("Error querying Supabase:", error);
+  }
+
+  if (cachedSuggestions && cachedSuggestions.suggestions) {
+    console.log("Cache hit for:------------------", query);
+    return cachedSuggestions.suggestions as PlaceSuggestion[];
+  }
+  // }
+  const googlePlacesApiUrl = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(
+    query
+  )}&key=${googleApiKey}`;
+
+  const googleResponse = await fetch(googlePlacesApiUrl);
+  const googleData = await googleResponse.json();
+  if (googleData.status === "OK" && googleData.predictions) {
+    const suggestions = googleData.predictions;
+    console.log("from google");
+    const { error: insertError } = await supabase
+      .from("places_suggestions")
+      .upsert({ query, suggestions }, { onConflict: "query" });
+
+    if (insertError) {
+      console.error("Error inserting/upserting data:", insertError.message);
+    }
+    return suggestions as PlaceSuggestion[];
+  }
+};
+
+export const ai_destination_info = async (
+  destination: string,
+  duration: DateRange
+) => {
+  const { text } = await generateText({
+    model: openai("gpt-4o"),
+    system: systemPrompt,
+    prompt: `Provide travel information for a trip to ${destination}, from ${duration.from}, to ${duration.to}.`,
+  });
+
+  return text;
 };
