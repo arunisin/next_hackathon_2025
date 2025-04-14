@@ -76,9 +76,9 @@ export default async function Page({
           {parsedData.culture?.source})
         </p>
         <ul>
-          {parsedData.culture?.local_customs?.map((custom, index) => (
-            <li key={index}>{custom}</li>
-          ))}
+          {parsedData.culture?.local_customs?.map(
+            (custom: string, index: number) => <li key={index}>{custom}</li>
+          )}
         </ul>
       </div>
       <div>
@@ -100,11 +100,11 @@ export default async function Page({
           {parsedData.language?.primary_language}
         </p>
         <ul>
-          {parsedData.language?.essential_phrases?.map((phraseObj, index) => (
+          {/* {parsedData.language?.essential_phrases?.map((phraseObj, index) => (
             <li key={index}>
               {phraseObj.phrase}: {phraseObj.translation}
             </li>
-          ))}
+          ))} */}
         </ul>
         <p>{parsedData.language?.translator_link_suggestion}</p>
       </div>
@@ -113,12 +113,12 @@ export default async function Page({
           <div>
             <strong>Events and Festivals:</strong>
             <ul>
-              {parsedData.events_and_festivals.map((event) => (
+              {/* {parsedData.events_and_festivals.map((event) => (
                 <li key={event.name}>
                   {event.name} ({event.dates}): {event.description} (sourced
                   from {event.source})
                 </li>
-              ))}
+              ))} */}
             </ul>
           </div>
         )}
