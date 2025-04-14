@@ -22,6 +22,7 @@ export default async function ProtectedPage() {
     <>
       <div className="flex-1 w-full flex flex-col gap-12">
         <UserInputs />
-      </div></>
+      </div>
+    </>
   );
 }
