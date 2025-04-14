@@ -143,20 +143,20 @@ export const place_suggestion = async (query: string) => {
   const googleApiKey = process.env.GOOGLE_MAPS_API_KEY;
   // const { data: session } = await supabase.auth.getSession();
   // if (session.session) {
-  const { data: cachedSuggestions, error } = await supabase
-    .from("places_suggestions")
-    .select("suggestions")
-    .eq("query", query)
-    .single();
+  // const { data: cachedSuggestions, error } = await supabase
+  //   .from("places_suggestions")
+  //   .select("suggestions")
+  //   .eq("query", query)
+  //   .single();
 
-  if (error) {
-    console.error("Error querying Supabase:", error);
-  }
+  // if (error) {
+  //   console.error("Error querying Supabase:", error);
+  // }
 
-  if (cachedSuggestions && cachedSuggestions.suggestions) {
-    console.log("Cache hit for:------------------", query);
-    return cachedSuggestions.suggestions as PlaceSuggestion[];
-  }
+  // if (cachedSuggestions && cachedSuggestions.suggestions) {
+  //   console.log("Cache hit for:------------------", query);
+  //   return cachedSuggestions.suggestions as PlaceSuggestion[];
+  // }
   // }
   const googlePlacesApiUrl = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(
     query
@@ -185,8 +185,32 @@ export const ai_destination_info = async (
   const { text } = await generateText({
     model: openai("gpt-4o"),
     system: systemPrompt,
-    prompt: `Provide travel information for a trip to ${destination}, from ${duration.from}, to ${duration.to}.`,
+    prompt: `Provide travel information for a trip to ${destination}, from ${duration.from}, to ${duration.to} as a json.`,
   });
+  const cleanedText = text?.trim();
+  const jsonStartIndex = cleanedText?.indexOf("{");
+  const jsonEndIndex = cleanedText?.lastIndexOf("}");
 
-  return text;
+  let jsonDataString = cleanedText;
+  if (
+    jsonStartIndex !== -1 &&
+    jsonEndIndex !== -1 &&
+    jsonStartIndex < jsonEndIndex
+  ) {
+    jsonDataString = cleanedText.substring(jsonStartIndex, jsonEndIndex + 1);
+  }
+  const supabase = await createClient();
+  const session = await supabase.auth.getUser();
+  const userId = session.data.user?.id;
+  const { data: newRecord, error } = await supabase
+    .from("travel_planner_data")
+    .insert([{ user_id: userId, data: jsonDataString }]) // Insert an array of objects
+    .select();
+
+  console.log(newRecord);
+  if (newRecord && newRecord.length > 0) {
+    return { id: newRecord[0].id }; // Return the ID of the first inserted row
+  } else {
+    return { message: "Data inserted successfully, but no ID returned." };
+  }
 };
