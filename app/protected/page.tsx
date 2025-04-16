@@ -3,9 +3,9 @@ import FetchDataSteps from "@/components/tutorial/fetch-data-steps";
 import { createClient } from "@/utils/supabase/server";
 import { InfoIcon } from "lucide-react";
 import { redirect } from "next/navigation";
-import QueryClientWrapper from "./components/QueryClinet";
+import QueryClientWrapper from "../../contexts/QueryClinet";
 import { DatePickerWithRange } from "@/components/date picker/DateRangePicker";
-import UserInputs from "./components/UserInputs";
+import UserInputs from "../../components/userInputs/UserInputs";
 
 export default async function ProtectedPage() {
   const supabase = await createClient();
