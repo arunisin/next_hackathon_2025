@@ -12,14 +12,12 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 
-// Generate static params for all destinations
-
-type Props = {
-  params: { destination: string };
-};
-
-export default async function Page({ params }: Props) {
-  const { destination } = params;
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ destination: string }>;
+}) {
+  const { destination } = await params;
   const supabase = await createClient();
   const session = supabase.auth.getUser();
   const userId = (await session).data.user?.id;
