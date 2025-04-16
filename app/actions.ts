@@ -225,7 +225,6 @@ export const ai_destination_info = async (
     .insert([{ user_id: userId, data: jsonDataString }]) // Insert an array of objects
     .select();
 
-  console.log(newRecord);
   if (newRecord && newRecord.length > 0) {
     return { id: newRecord[0].id }; // Return the ID of the first inserted row
   } else {
