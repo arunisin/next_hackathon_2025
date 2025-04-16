@@ -3,6 +3,7 @@ import Hero from "@/components/hero";
 import TravelPlannerForm from "@/components/test/TravelPlannerForm";
 import ConnectSupabaseSteps from "@/components/tutorial/connect-supabase-steps";
 import SignUpUserSteps from "@/components/tutorial/sign-up-user-steps";
+import UserInputs from "@/components/userInputs/UserInputs";
 import { hasEnvVars } from "@/utils/supabase/check-env-vars";
 import { Suspense } from "react";
 
@@ -14,7 +15,7 @@ export default async function Home() {
         <h2 className="font-medium text-xl mb-4">Next steps</h2>
         {/* <TravelPlannerForm /> */}
         <Suspense fallback={<div>Loading places...</div>}>
-          <PlaceAutocomplete />
+          <UserInputs />
         </Suspense>
         {/* {hasEnvVars ? <SignUpUserSteps /> : <ConnectSupabaseSteps />} */}
       </main>

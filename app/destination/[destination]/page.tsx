@@ -12,12 +12,29 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 
+// This makes the page static
+export const dynamic = "force-static";
+
+// Generate static params for all destinations
+export async function generateStaticParams() {
+  const supabase = await createClient();
+  const { data: destinations } = await supabase
+    .from("travel_planner_data")
+    .select("id");
+
+  return (
+    destinations?.map((destination) => ({
+      destination: destination.id,
+    })) || []
+  );
+}
+
 export default async function Page({
   params,
 }: {
-  params: Promise<{ destination: string }>;
+  params: { destination: string };
 }) {
-  const { destination } = await params;
+  const { destination } = params;
   const supabase = await createClient();
   const session = supabase.auth.getUser();
   const userId = (await session).data.user?.id;
