@@ -27,23 +27,25 @@ const UserInputs = () => {
   const [error, setError] = useState<string | null>(null);
   const [showPlaneAnimation, setShowPlaneAnimation] = useState(false);
 
-  // Load initial values from search params
   useEffect(() => {
-    const destination = searchParams.get("destination");
-    const fromDate = searchParams.get("from");
-    const toDate = searchParams.get("to");
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const destination = params.get("destination");
+      const fromDate = params.get("from");
+      const toDate = params.get("to");
 
-    if (destination) {
-      setPlace({ description: destination } as PlaceSuggestion);
-    }
+      if (destination) {
+        setPlace({ description: destination } as PlaceSuggestion);
+      }
 
-    if (fromDate && toDate) {
-      setDateRange({
-        from: new Date(fromDate),
-        to: new Date(toDate),
-      });
+      if (fromDate && toDate) {
+        setDateRange({
+          from: new Date(fromDate),
+          to: new Date(toDate),
+        });
+      }
     }
-  }, [searchParams]);
+  }, []);
 
   const handleSignIn = useCallback(() => {
     if (!place || !dateRange) return;
