@@ -9,6 +9,7 @@ import { DateRange } from "react-day-picker";
 import { generateObject, generateText } from "ai";
 import { openai } from "@ai-sdk/openai";
 import { systemPrompt } from "@/lib/utils";
+import { DestinationInfoSchema } from "@/lib/ai/schemas/destination-info";
 
 export const signUpAction = async (formData: FormData) => {
   const email = formData.get("email")?.toString();
@@ -59,6 +60,40 @@ export const signInAction = async (formData: FormData) => {
   }
 
   return redirect("/protected");
+};
+
+export const signInWithGoogleAction = async (formData: FormData) => {
+  const supabase = await createClient();
+  const origin = (await headers()).get("origin");
+
+  // Get redirect params from form data
+  const destination = formData.get("destination")?.toString();
+  const fromDate = formData.get("from")?.toString();
+  const toDate = formData.get("to")?.toString();
+
+  let redirectUrl = `${origin}/auth/callback`;
+
+  // If we have destination params, add them to the callback URL
+  if (destination) {
+    const params = new URLSearchParams();
+    params.set("destination", destination);
+    if (fromDate) params.set("from", fromDate);
+    if (toDate) params.set("to", toDate);
+    redirectUrl += `?${params.toString()}`;
+  }
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: redirectUrl,
+    },
+  });
+
+  if (error) {
+    return encodedRedirect("error", "/sign-in", error.message);
+  }
+
+  return redirect(data.url);
 };
 
 export const forgotPasswordAction = async (formData: FormData) => {
@@ -187,30 +222,69 @@ export const ai_destination_info = async (
     system: systemPrompt,
     prompt: `Provide travel information for a trip to ${destination}, from ${duration.from}, to ${duration.to} as a json.`,
   });
-  const cleanedText = text?.trim();
-  const jsonStartIndex = cleanedText?.indexOf("{");
-  const jsonEndIndex = cleanedText?.lastIndexOf("}");
 
-  let jsonDataString = cleanedText;
-  if (
-    jsonStartIndex !== -1 &&
-    jsonEndIndex !== -1 &&
-    jsonStartIndex < jsonEndIndex
-  ) {
-    jsonDataString = cleanedText.substring(jsonStartIndex, jsonEndIndex + 1);
+  if (!text) {
+    throw new Error("No response from AI");
   }
+
+  // Clean and parse the JSON response
+  const cleanedText = text.trim();
+  const jsonStartIndex = cleanedText.indexOf("{");
+  const jsonEndIndex = cleanedText.lastIndexOf("}");
+
+  if (
+    jsonStartIndex === -1 ||
+    jsonEndIndex === -1 ||
+    jsonStartIndex >= jsonEndIndex
+  ) {
+    throw new Error("Invalid JSON response from AI");
+  }
+
+  const jsonDataString = cleanedText.substring(
+    jsonStartIndex,
+    jsonEndIndex + 1
+  );
+  let parsedData;
+
+  try {
+    parsedData = JSON.parse(jsonDataString);
+  } catch (error) {
+    throw new Error("Failed to parse AI response as JSON");
+  }
+
+  // Validate the data against our schema
+  const result = DestinationInfoSchema.safeParse(parsedData);
+
+  if (!result.success) {
+    console.error("Validation errors:", result.error.format());
+    throw new Error("AI response did not match expected format");
+  }
+
+  // Store in database
   const supabase = await createClient();
   const session = await supabase.auth.getUser();
   const userId = session.data.user?.id;
+
   const { data: newRecord, error } = await supabase
     .from("travel_planner_data")
-    .insert([{ user_id: userId, data: jsonDataString }]) // Insert an array of objects
+    .insert([
+      {
+        user_id: userId,
+        data: JSON.stringify(result.data), // Store the validated data
+      },
+    ])
     .select();
 
-  console.log(newRecord);
-  if (newRecord && newRecord.length > 0) {
-    return { id: newRecord[0].id }; // Return the ID of the first inserted row
-  } else {
-    return { message: "Data inserted successfully, but no ID returned." };
+  if (error) {
+    throw new Error("Failed to save destination info");
   }
+
+  if (newRecord && newRecord.length > 0) {
+    return {
+      id: newRecord[0].id,
+      data: result.data, // Return the validated data
+    };
+  }
+
+  throw new Error("Failed to save destination info");
 };
