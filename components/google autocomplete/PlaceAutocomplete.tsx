@@ -17,6 +17,7 @@ interface PlaceAutocompleteProps {
   placeholder?: string;
   className?: string;
   minChars?: number;
+  initialValue?: string;
 }
 
 const PlaceAutocomplete = ({
@@ -24,9 +25,10 @@ const PlaceAutocomplete = ({
   placeholder = "Search for a place...",
   className,
   minChars = 2,
+  initialValue,
 }: PlaceAutocompleteProps) => {
   const [open, setOpen] = useState(false);
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState(initialValue || "");
   const containerRef = useRef<HTMLDivElement>(null);
 
   const {
@@ -73,6 +75,12 @@ const PlaceAutocomplete = ({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    if (initialValue && !query) {
+      setQuery(initialValue);
+    }
+  }, [initialValue, query, setQuery]);
 
   return (
     <div className={cn("relative w-full", className)} ref={containerRef}>

@@ -31,6 +31,58 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={geistSans.className} suppressHydrationWarning>
+      <head>
+        <style>
+          {`
+            ::view-transition-old(root),
+            ::view-transition-new(root) {
+              animation: none;
+              mix-blend-mode: normal;
+            }
+
+            ::view-transition-old(page) {
+              animation: 0.5s cubic-bezier(0.4, 0, 0.2, 1) both fade-out,
+                        0.5s cubic-bezier(0.4, 0, 0.2, 1) both slide-to-left;
+            }
+
+            ::view-transition-new(page) {
+              animation: 0.5s cubic-bezier(0.4, 0, 0.2, 1) both fade-in,
+                        0.5s cubic-bezier(0.4, 0, 0.2, 1) both slide-from-right;
+            }
+
+            @keyframes fade-in {
+              from { opacity: 0; }
+              to { opacity: 1; }
+            }
+
+            @keyframes fade-out {
+              from { opacity: 1; }
+              to { opacity: 0; }
+            }
+
+            @keyframes slide-from-right {
+              from { transform: translateX(100%); }
+              to { transform: translateX(0); }
+            }
+
+            @keyframes slide-to-left {
+              from { transform: translateX(0); }
+              to { transform: translateX(-100%); }
+            }
+
+            @keyframes plane-takeoff {
+              0% {
+                transform: translateX(0) translateY(0) rotate(0);
+                opacity: 1;
+              }
+              100% {
+                transform: translateX(100vw) translateY(-100vh) rotate(45deg);
+                opacity: 0;
+              }
+            }
+          `}
+        </style>
+      </head>
       <body className="bg-background text-foreground">
         <ThemeProvider
           attribute="class"
@@ -45,17 +97,13 @@ export default function RootLayout({
                   <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm">
                     <div className="flex gap-5 items-center font-semibold">
                       <Link href={"/"}>TravelCulture</Link>
-                      {/* <div className="flex items-center gap-2">
-                      <DeployButton />
-                    </div> */}
                     </div>
                     {!hasEnvVars ? <EnvVarWarning /> : <HeaderAuth />}
                   </div>
                 </nav>
-                <div className="flex flex-col gap-20 w-4/5 md:max-w-5xl md:p-5">
+                <div className="flex flex-col gap-20 w-4/5 md:max-w-5xl md:p-5 view-transition-page">
                   {children}
                 </div>
-
                 <footer className="w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-8 py-16">
                   <p>
                     Powered by{" "}

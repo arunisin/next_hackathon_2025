@@ -17,17 +17,48 @@ import { CalendarIcon } from "lucide-react";
 export function DatePickerWithRange({
   className,
   onDateSelect,
+  initialValue,
 }: React.HTMLAttributes<HTMLDivElement> & {
   onDateSelect?: (date: DateRange | undefined) => void;
+  initialValue?: DateRange;
 }) {
-  const [date, setDate] = React.useState<DateRange | undefined>({
-    from: new Date(),
-    to: addDays(new Date(), 20),
-  });
+  const [date, setDate] = React.useState<DateRange | undefined>(
+    initialValue ?? {
+      from: new Date(),
+      to: addDays(new Date(), 20),
+    }
+  );
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [isEndDateSelection, setIsEndDateSelection] = React.useState(false);
+
+  React.useEffect(() => {
+    if (initialValue) {
+      setDate(initialValue);
+    }
+  }, [initialValue]);
+
+  const handleSelect = (newDate: DateRange | undefined) => {
+    setDate(newDate);
+    if (onDateSelect) {
+      onDateSelect(newDate);
+    }
+
+    // If we have a start date but no end date, we're selecting the end date
+    if (newDate?.from && !newDate?.to && !isEndDateSelection) {
+      setIsEndDateSelection(true);
+      return;
+    }
+
+    // If we have both dates or we're in end date selection mode, close the popover
+    if ((newDate?.from && newDate?.to) || isEndDateSelection) {
+      setIsOpen(false);
+      setIsEndDateSelection(false);
+    }
+  };
 
   return (
     <div className={cn("grid gap-2", className)}>
-      <Popover>
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
           <Button
             id="date"
@@ -58,12 +89,7 @@ export function DatePickerWithRange({
             mode="range"
             defaultMonth={date?.from}
             selected={date}
-            onSelect={(e) => {
-              setDate(e);
-              if (onDateSelect) {
-                onDateSelect(e);
-              }
-            }}
+            onSelect={handleSelect}
             numberOfMonths={2}
           />
         </PopoverContent>

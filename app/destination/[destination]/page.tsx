@@ -1,6 +1,11 @@
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 
+const slideInFromRight = {
+  initial: { x: "100%" },
+  animate: { x: 0, transition: { duration: 0.5, ease: "easeOut" } },
+};
+
 export default async function Page({
   params,
 }: {
@@ -14,15 +19,10 @@ export default async function Page({
   const { data: travelData, error } = await supabase
     .from("travel_planner_data")
     .select("*")
-    .eq("id", destination) // Assuming 'destination' is a key within your JSON 'data' column
-    .single(); // Expecting only one row with this destination
+    .eq("id", destination)
+    .single();
 
-  console.log(travelData);
-
-  if (!userId && travelData.user_id) {
-    // If no user is logged in, we can't check ownership
-    // You might want to handle this differently based on your app's logic
-    // For now, let's assume unauthenticated users can't view specific posts
+  if (!userId && travelData?.user_id) {
     redirect("/not-found");
   }
 
@@ -48,86 +48,122 @@ export default async function Page({
   }
 
   return (
-    <div>
-      <h1>{parsedData.destination}</h1>
-      <div>
-        <strong>Duration:</strong> {parsedData.duration?.from} to{" "}
-        {parsedData.duration?.to}
+    <div className="view-transition-page w-full max-w-4xl mx-auto p-6 space-y-8 bg-card rounded-lg shadow-lg">
+      <h1 className="text-4xl font-bold mb-6">{parsedData.destination}</h1>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        <div className="space-y-4">
+          <div className="p-4 bg-muted rounded-lg">
+            <strong className="text-lg block mb-2">Duration:</strong>
+            <span>
+              {parsedData.duration?.from} to {parsedData.duration?.to}
+            </span>
+          </div>
+
+          <div className="p-4 bg-muted rounded-lg">
+            <strong className="text-lg block mb-2">Weather:</strong>
+            <p>{parsedData.weather?.description}</p>
+            <p className="text-sm text-muted-foreground">
+              {parsedData.weather?.temperature_range}
+              <span className="text-xs">
+                {" "}
+                (via {parsedData.weather?.source})
+              </span>
+            </p>
+          </div>
+
+          <div className="p-4 bg-muted rounded-lg">
+            <strong className="text-lg block mb-2">Timezone:</strong>
+            <p>{parsedData.timezone?.name}</p>
+            <p className="text-sm text-muted-foreground">
+              {parsedData.timezone?.utc_offset}
+              <span className="text-xs">
+                {" "}
+                (via {parsedData.timezone?.source})
+              </span>
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div className="p-4 bg-muted rounded-lg">
+            <strong className="text-lg block mb-2">Currency:</strong>
+            <p>{parsedData.currency?.name}</p>
+            <p className="text-sm text-muted-foreground">
+              {parsedData.currency?.symbol} - {parsedData.currency?.code}
+              <span className="text-xs">
+                {" "}
+                (via {parsedData.currency?.source})
+              </span>
+            </p>
+          </div>
+
+          <div className="p-4 bg-muted rounded-lg">
+            <strong className="text-lg block mb-2">Culture:</strong>
+            <p className="mb-2">{parsedData.culture?.background}</p>
+            <div className="space-y-1">
+              {parsedData.culture?.local_customs?.map(
+                (custom: string, index: number) => (
+                  <p key={index} className="text-sm">
+                    • {custom}
+                  </p>
+                )
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              via {parsedData.culture?.source}
+            </p>
+          </div>
+        </div>
       </div>
-      <div>
-        <strong>Weather:</strong> {parsedData.weather?.description} (
-        {parsedData.weather?.temperature_range}, sourced from{" "}
-        {parsedData.weather?.source})
-      </div>
-      <div>
-        <strong>Timezone:</strong> {parsedData.timezone?.name} (
-        {parsedData.timezone?.utc_offset}, sourced from{" "}
-        {parsedData.timezone?.source})
-      </div>
-      <div>
-        <strong>Currency:</strong> {parsedData.currency?.name} (
-        {parsedData.currency?.symbol} - {parsedData.currency?.code}, sourced
-        from {parsedData.currency?.source})
-      </div>
-      <div>
-        <strong>Culture:</strong>
-        <p>
-          {parsedData.culture?.background} (sourced from{" "}
-          {parsedData.culture?.source})
-        </p>
-        <ul>
-          {parsedData.culture?.local_customs?.map(
-            (custom: string, index: number) => <li key={index}>{custom}</li>
+
+      <div className="space-y-4">
+        <div className="p-4 bg-muted rounded-lg">
+          <strong className="text-lg block mb-2">Food and Drinks:</strong>
+          <div className="space-y-4">
+            <div>
+              <h3 className="font-medium">Local Cuisine:</h3>
+              <p className="text-sm">
+                {parsedData.food_and_drinks?.local_cuisine?.join(", ")}
+              </p>
+            </div>
+            <div>
+              <h3 className="font-medium">Must-try Drinks:</h3>
+              <p className="text-sm">
+                {parsedData.food_and_drinks?.must_try_drinks?.join(", ")}
+              </p>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              via {parsedData.food_and_drinks?.source}
+            </p>
+          </div>
+        </div>
+
+        {parsedData.events_and_festivals &&
+          parsedData.events_and_festivals.length > 0 && (
+            <div className="p-4 bg-muted rounded-lg">
+              <strong className="text-lg block mb-2">
+                Events and Festivals:
+              </strong>
+              <ul className="space-y-2">
+                {parsedData.events_and_festivals.map((event: any) => (
+                  <li key={event.name} className="text-sm">
+                    <span className="font-medium">{event.name}</span> (
+                    {event.dates})
+                    <p className="text-muted-foreground">{event.description}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
           )}
-        </ul>
-      </div>
-      <div>
-        <strong>Food and Drinks:</strong>
-        <p>
-          <strong>Local Cuisine:</strong>{" "}
-          {parsedData.food_and_drinks?.local_cuisine?.join(", ")} (sourced from{" "}
-          {parsedData.food_and_drinks?.source})
-        </p>
-        <p>
-          <strong>Must-try Drinks:</strong>{" "}
-          {parsedData.food_and_drinks?.must_try_drinks?.join(", ")}
-        </p>
-      </div>
-      <div>
-        <strong>Language:</strong>
-        <p>
-          <strong>Primary Language:</strong>{" "}
-          {parsedData.language?.primary_language}
-        </p>
-        <ul>
-          {/* {parsedData.language?.essential_phrases?.map((phraseObj, index) => (
-            <li key={index}>
-              {phraseObj.phrase}: {phraseObj.translation}
-            </li>
-          ))} */}
-        </ul>
-        <p>{parsedData.language?.translator_link_suggestion}</p>
-      </div>
-      {parsedData.events_and_festivals &&
-        parsedData.events_and_festivals.length > 0 && (
-          <div>
-            <strong>Events and Festivals:</strong>
-            <ul>
-              {/* {parsedData.events_and_festivals.map((event) => (
-                <li key={event.name}>
-                  {event.name} ({event.dates}): {event.description} (sourced
-                  from {event.source})
-                </li>
-              ))} */}
-            </ul>
+
+        {parsedData.additional_notes && (
+          <div className="p-4 bg-muted rounded-lg">
+            <strong className="text-lg block mb-2">Additional Notes:</strong>
+            <p className="text-sm">{parsedData.additional_notes}</p>
           </div>
         )}
-      {parsedData.additional_notes && (
-        <div>
-          <strong>Additional Notes:</strong>
-          <p>{parsedData.additional_notes}</p>
-        </div>
-      )}
+      </div>
     </div>
   );
 }
