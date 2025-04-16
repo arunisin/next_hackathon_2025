@@ -16,10 +16,9 @@ import {
 
 type Props = {
   params: { destination: string };
-  searchParams: { [key: string]: string | string[] | undefined };
 };
 
-export default async function Page({ params, searchParams }: Props) {
+export default async function Page({ params }: Props) {
   const { destination } = params;
   const supabase = await createClient();
   const session = supabase.auth.getUser();
