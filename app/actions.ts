@@ -217,10 +217,32 @@ export const ai_destination_info = async (
   destination: string,
   duration: DateRange
 ) => {
+  const currentDate = new Date();
   const { text } = await generateText({
     model: openai("gpt-4o"),
     system: systemPrompt,
-    prompt: `Provide travel information for a trip to ${destination}, from ${duration.from}, to ${duration.to} as a json.`,
+    prompt: `Create a comprehensive travel guide for ${destination} for a trip from ${duration.from} to ${duration.to}.
+
+Please provide extensive details for each section, including:
+- Current seasonal weather patterns and climate information
+- Detailed transportation options with current prices
+- Rich cultural context and customs
+- Specific local food recommendations with where to try them
+- Authentic shopping experiences and local markets
+- Detailed neighborhood/district guides
+- Up-to-date practical information (visa, safety, etc.)
+- Current prices and cost estimates
+- Seasonal events and festivals during the travel period
+- Comprehensive attraction details with visiting tips
+
+Focus on providing specific, actionable information that helps travelers make informed decisions. Include local insights and insider tips where possible. Make sure all information is current as of ${currentDate.toLocaleDateString()}.
+
+Important: Ensure every section in the response includes a "source" field with attribution.
+For date fields, use the format: YYYY-MM-DD
+For currency fields, include both local currency and USD equivalent.
+Each array should contain at least 2-3 items.
+
+Return the information as a complete JSON object following the schema exactly.`,
   });
 
   if (!text) {
@@ -228,27 +250,30 @@ export const ai_destination_info = async (
   }
 
   // Clean and parse the JSON response
-  const cleanedText = text.trim();
-  const jsonStartIndex = cleanedText.indexOf("{");
-  const jsonEndIndex = cleanedText.lastIndexOf("}");
+  let cleanedText = text.trim();
 
-  if (
-    jsonStartIndex === -1 ||
-    jsonEndIndex === -1 ||
-    jsonStartIndex >= jsonEndIndex
-  ) {
-    throw new Error("Invalid JSON response from AI");
+  // Remove any markdown code block markers
+  cleanedText = cleanedText.replace(/^```json\s*/, "");
+  cleanedText = cleanedText.replace(/^```\s*/, "");
+  cleanedText = cleanedText.replace(/\s*```$/, "");
+
+  // Find the actual JSON content
+  const firstBrace = cleanedText.indexOf("{");
+  const lastBrace = cleanedText.lastIndexOf("}");
+
+  if (firstBrace === -1 || lastBrace === -1 || firstBrace >= lastBrace) {
+    throw new Error("Could not find valid JSON content in AI response");
   }
 
-  const jsonDataString = cleanedText.substring(
-    jsonStartIndex,
-    jsonEndIndex + 1
-  );
-  let parsedData;
+  // Extract just the JSON object
+  const jsonContent = cleanedText.slice(firstBrace, lastBrace + 1);
 
+  let parsedData;
   try {
-    parsedData = JSON.parse(jsonDataString);
+    parsedData = JSON.parse(jsonContent);
   } catch (error) {
+    console.error("JSON Parse Error:", error);
+    console.error("Attempted to parse:", jsonContent);
     throw new Error("Failed to parse AI response as JSON");
   }
 
@@ -256,8 +281,16 @@ export const ai_destination_info = async (
   const result = DestinationInfoSchema.safeParse(parsedData);
 
   if (!result.success) {
-    console.error("Validation errors:", result.error.format());
-    throw new Error("AI response did not match expected format");
+    // Log detailed validation errors
+    console.error("Schema Validation Errors:");
+    const formattedErrors = result.error.format();
+    console.error(JSON.stringify(formattedErrors, null, 2));
+
+    // Create a more helpful error message
+    const errorPaths = result.error.issues.map(
+      (issue) => `${issue.path.join(".")}: ${issue.message}`
+    );
+    throw new Error(`AI response validation failed:\n${errorPaths.join("\n")}`);
   }
 
   // Store in database

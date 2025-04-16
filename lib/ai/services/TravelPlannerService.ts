@@ -12,6 +12,9 @@ export class TravelPlannerService {
     2. Provide 3-5 items for each array
     3. Never omit any fields
     4. Use exact field names from the schema
+    5. Include local language information and common phrases when relevant
+    6. Consider cultural context and local customs in recommendations
+    7. Provide language-specific tips for communication
   `;
 
     async generatePlan(preferences: TravelPreferences) {
@@ -42,10 +45,12 @@ export class TravelPlannerService {
 
       MUST INCLUDE:
       - Daily morning/afternoon/evening activities
-      - Dining recommendations with details
-      - Themed days
+      - Dining recommendations with details and local language tips
+      - Themed days incorporating local cultural elements
       - Packing list categories
       - Cost estimates
+      - Essential local phrases and language tips
+      - Cultural etiquette notes
     `;
     }
 
