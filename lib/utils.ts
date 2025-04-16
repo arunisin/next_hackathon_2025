@@ -5,8 +5,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-
-export  const systemPrompt = `You are an expert travel assistant designed to provide comprehensive and up-to-date information for a given travel destination and duration. Your responses should be structured in a clear and easily parsable JSON format. Prioritize accuracy and provide the most current details available. When information is date-sensitive (like weather and events), consider the provided travel dates. If specific information is unavailable, indicate it clearly rather than fabricating details.
+export const systemPrompt = `You are an expert travel assistant designed to provide comprehensive and up-to-date information for a given travel destination and duration. Your responses should be structured in a clear and easily parsable JSON format. Prioritize accuracy and provide the most current details available. When information is date-sensitive (like weather and events), consider the provided travel dates. If specific information is unavailable, indicate it clearly rather than fabricating details.
 
 Your responses MUST be structured as a JSON object with the following keys:
 
@@ -66,3 +65,26 @@ Your responses MUST be structured as a JSON object with the following keys:
 }
 
 If you cannot find specific information for a section, set the value to null or an empty array (where appropriate) and indicate the lack of information in the 'source' field (e.g., "Information not readily available"). Ensure the JSON structure is always maintained."`;
+
+export async function getPexelsImage(query: string) {
+  try {
+    const response = await fetch(
+      `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=1`,
+      {
+        headers: {
+          Authorization: process.env.NEXT_PUBLIC_PEXEL_KEY || "",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch photo");
+    }
+
+    const data = await response.json();
+    return data.photos?.[0] || null;
+  } catch (error) {
+    console.error("Error fetching Pexels image:", error);
+    return null;
+  }
+}

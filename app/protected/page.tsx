@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import QueryClientWrapper from "../../contexts/QueryClinet";
 import { DatePickerWithRange } from "@/components/date picker/DateRangePicker";
 import UserInputs from "../../components/userInputs/UserInputs";
+import { Suspense } from "react";
 
 export default async function ProtectedPage() {
   const supabase = await createClient();
@@ -21,7 +22,9 @@ export default async function ProtectedPage() {
   return (
     <>
       <div className="flex-1 w-full flex flex-col gap-12">
-        <UserInputs />
+        <Suspense fallback={<div>Loading inputs...</div>}>
+          <UserInputs />
+        </Suspense>
       </div>
     </>
   );

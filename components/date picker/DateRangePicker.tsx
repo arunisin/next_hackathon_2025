@@ -23,10 +23,7 @@ export function DatePickerWithRange({
   initialValue?: DateRange;
 }) {
   const [date, setDate] = React.useState<DateRange | undefined>(
-    initialValue ?? {
-      from: new Date(),
-      to: addDays(new Date(), 20),
-    }
+    initialValue ?? undefined
   );
   const [isOpen, setIsOpen] = React.useState(false);
   const [isEndDateSelection, setIsEndDateSelection] = React.useState(false);
