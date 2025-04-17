@@ -9,9 +9,9 @@ import { Suspense } from "react";
 
 export default async function Home() {
   return (
-    <div className="min-h-screen flex-1 flex justify-center items-center">
+    <div className="min-h-[calc(100vw-100px)] flex-1 flex justify-center items-center">
       {/* <Hero /> */}
-      <main className=" overflow-hidden flex-1 flex flex-col  gap-6 p-8">
+      <main className="max-w-3xl overflow-hidden flex-1 flex flex-col  gap-6 p-8">
         <h2 className="font-medium text-xl">Where are we going this time?</h2>
         {/* <TravelPlannerForm /> */}
         <Suspense fallback={<div>Loading places...</div>}>
