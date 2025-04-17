@@ -158,7 +158,7 @@ const UserInputs = () => {
       <Button
         onClick={handleSubmit}
         disabled={isSubmitting || !place || !dateRange}
-        className="w-full"
+        className="w-full hover:bg-violet-800"
       >
         {isSubmitting ? "Processing..." : "Let's go"}
       </Button>
