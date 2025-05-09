@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
 
-export function AuthTransition({ children }: { children: React.ReactNode }) {
+export function AnimTransition({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const [transitionStage, setTransitionStage] = useState('enter');
     const [currentChildren, setCurrentChildren] = useState(children);
@@ -29,8 +29,7 @@ export function AuthTransition({ children }: { children: React.ReactNode }) {
 
     return (
         <div className={cn(
-            "flex justify-center items-center backdrop-blur-sm bg-white/20 p-6 rounded-lg border border-white/10 shadow-lg w-[90%]",
-            // "flex justify-center items-center bg-white rounded-lg shadow-lg w-[90%]",
+            "flex justify-center items-center backdrop-blur-sm bg-white/20 dark:bg-black/30 p-6 rounded-lg border dark:border-white/5 border-white/10 shadow-lg md:w-1/4 w-[90%]",
             transitionStage === 'enter' ? 'animate-slide-in' : 'animate-slide-out'
         )}>
             {currentChildren}

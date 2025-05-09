@@ -1,13 +1,14 @@
 import DeployButton from "@/components/deploy-button";
 import { EnvVarWarning } from "@/components/env-var-warning";
 import HeaderAuth from "@/components/header-auth";
-import { ThemeSwitcher } from "@/components/theme-switcher";
 import { hasEnvVars } from "@/utils/supabase/check-env-vars";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import Link from "next/link";
 import "./globals.css";
 import QueryClientWrapper from "../contexts/QueryClinet";
+import { AnimTransition } from "../components/transitions/AnimTransition";
+import BgImage from "@/components/common/bg-image";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -24,18 +25,12 @@ const geistSans = Geist({
   subsets: ["latin"],
 });
 
-const bgImages = [
-  "https://res.cloudinary.com/dukf4gpsh/image/upload/v1746799041/next-hackathon/ChatGPT_Image_May_9_2025_07_19_54_PM_ekrzer.webp",
-  "https://res.cloudinary.com/dukf4gpsh/image/upload/v1746799040/next-hackathon/ChatGPT_Image_May_9_2025_07_18_07_PM_uy9lgj.webp",
-  "https://res.cloudinary.com/dukf4gpsh/image/upload/v1746799040/next-hackathon/ChatGPT_Image_May_9_2025_07_16_23_PM_gh3pqp.webp"
-];
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const randomBgImage = bgImages[Math.floor(Math.random() * bgImages.length)];
 
   return (
     <html lang="en" className={geistSans.className} suppressHydrationWarning>
@@ -111,17 +106,11 @@ export default function RootLayout({
                     {!hasEnvVars ? <EnvVarWarning /> : <HeaderAuth />}
                   </div>
                 </nav>
-                <div 
-                  // className="view-transition-page"
-                  className="w-full flex flex-col gap-12 items-center justify-center h-screen-minus-header"
-                  style={{
-                    backgroundImage: `url(${randomBgImage})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    backgroundRepeat: 'no-repeat'
-                  }}
-                >
-                  {children}
+                <BgImage>
+                  <AnimTransition>
+                    {children}
+                  </AnimTransition>
+                </BgImage>
                 </div>
                 {/* <footer className="w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-8 py-16">
                   <p>
@@ -137,7 +126,6 @@ export default function RootLayout({
                   </p>
                   <ThemeSwitcher />
                 </footer> */}
-              </div>
             </main>
           </QueryClientWrapper>
         </ThemeProvider>
