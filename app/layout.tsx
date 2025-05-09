@@ -24,11 +24,19 @@ const geistSans = Geist({
   subsets: ["latin"],
 });
 
+const bgImages = [
+  "https://res.cloudinary.com/dukf4gpsh/image/upload/v1746799041/next-hackathon/ChatGPT_Image_May_9_2025_07_19_54_PM_ekrzer.webp",
+  "https://res.cloudinary.com/dukf4gpsh/image/upload/v1746799040/next-hackathon/ChatGPT_Image_May_9_2025_07_18_07_PM_uy9lgj.webp",
+  "https://res.cloudinary.com/dukf4gpsh/image/upload/v1746799040/next-hackathon/ChatGPT_Image_May_9_2025_07_16_23_PM_gh3pqp.webp"
+];
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const randomBgImage = bgImages[Math.floor(Math.random() * bgImages.length)];
+
   return (
     <html lang="en" className={geistSans.className} suppressHydrationWarning>
       <head>
@@ -83,7 +91,9 @@ export default function RootLayout({
           `}
         </style>
       </head>
-      <body className="bg-background text-foreground">
+      <body 
+        className="bg-background text-foreground"
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -101,7 +111,18 @@ export default function RootLayout({
                     {!hasEnvVars ? <EnvVarWarning /> : <HeaderAuth />}
                   </div>
                 </nav>
-                <div className="view-transition-page">{children}</div>
+                <div 
+                  // className="view-transition-page"
+                  className="w-full flex flex-col gap-12 items-center justify-center h-screen-minus-header"
+                  style={{
+                    backgroundImage: `url(${randomBgImage})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat'
+                  }}
+                >
+                  {children}
+                </div>
                 {/* <footer className="w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-8 py-16">
                   <p>
                     Powered by{" "}

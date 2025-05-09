@@ -39,6 +39,7 @@ const PlaceAutocomplete = ({
   } = usePlaceSuggestion();
 
   const handleSelect = (place: any) => {
+    console.log('place', place);
     setQuery(place.description);
     setInputValue(place.description);
     setOpen(false);
