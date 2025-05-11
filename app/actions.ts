@@ -8,7 +8,7 @@ import { PlaceSuggestion } from "@/components/google autocomplete/place_suggesti
 import { DateRange } from "react-day-picker";
 import { generateObject, generateText } from "ai";
 import { openai } from "@ai-sdk/openai";
-import { systemPrompt } from "@/lib/utils";
+import { getPlaceImage, systemPrompt } from "@/lib/utils";
 import { DestinationInfoSchema } from "@/lib/ai/schemas/destination-info";
 
 export const signUpAction = async (formData: FormData) => {
@@ -215,7 +215,8 @@ export const place_suggestion = async (query: string) => {
 
 export const ai_destination_info = async (
   destination: string,
-  duration: DateRange
+  duration: DateRange,
+  place: PlaceSuggestion
 ) => {
   const currentDate = new Date();
   const { text } = await generateText({
@@ -270,7 +271,14 @@ Return the information as a complete JSON object following the schema exactly.`,
 
   let parsedData;
   try {
+    const photoResponse = await getPlaceImage(place.place_id);
+
     parsedData = JSON.parse(jsonContent);
+    parsedData = {
+      ...parsedData, 
+      place_data: JSON.stringify(place),
+      place_img: JSON.stringify(photoResponse)
+    }
   } catch (error) {
     console.error("JSON Parse Error:", error);
     console.error("Attempted to parse:", jsonContent);
@@ -279,6 +287,8 @@ Return the information as a complete JSON object following the schema exactly.`,
 
   // Validate the data against our schema
   const result = DestinationInfoSchema.safeParse(parsedData);
+
+  console.log('object', result.data);
 
   if (!result.success) {
     // Log detailed validation errors
@@ -298,12 +308,17 @@ Return the information as a complete JSON object following the schema exactly.`,
   const session = await supabase.auth.getUser();
   const userId = session.data.user?.id;
 
+
+
   const { data: newRecord, error } = await supabase
     .from("travel_planner_data")
     .insert([
       {
         user_id: userId,
-        data: JSON.stringify(result.data), // Store the validated data
+        data: JSON.stringify({
+          ...result.data,
+          
+        }), // Store the validated data
       },
     ])
     .select();

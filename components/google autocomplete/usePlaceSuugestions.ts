@@ -6,6 +6,7 @@ import debounce from "lodash.debounce";
 // Function to fetch place suggestions
 const fetchPlaceSuggestion = async (query: string) => {
   if (!query) return []; // Return empty array if query is empty
+  console.log('running here');
   const places = await place_suggestion(query);
   return places;
 };

@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { TravelPlannerDataWithParsedInfo } from "@/lib/types/database";
 import { createClient } from "@/utils/supabase/server";
+import Link from "next/link";
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -27,8 +28,8 @@ export default async function ProfilePage() {
     })) || [];
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">My Travel Plans</h1>
+    <div className="container mx-auto p-4 light-glass-card h-screen-minus-header mt-8 overflow-scroll">
+      <h1 className="text-3xl font-bold mb-8 text-white">My Travel Plans</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {parsedTravelPlans.map((plan) => (
@@ -58,12 +59,18 @@ export default async function ProfilePage() {
               </div> */}
             </div>
             <div className="mt-4">
-              <a
+              <Link 
                 href={`/destination/${encodeURIComponent(plan.id)}`}
                 className="text-blue-600 hover:text-blue-800 text-sm font-medium"
               >
                 View Details →
-              </a>
+              </Link>
+              {/* <a
+                href={}
+                className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+              >
+                View Details →
+              </a> */}
             </div>
           </div>
         ))}

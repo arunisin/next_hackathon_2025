@@ -17,12 +17,14 @@ import {
 } from "lucide-react";
 import BottomNav from "@/components/navigation/BottomNav";
 import type { TravelPlannerData, DestinationInfo } from "@/lib/types/database";
-import { getPexelsImage } from "@/lib/utils";
+import { getPexelsImage, getPlaceImage } from "@/lib/utils";
 import { Collapsible } from "@radix-ui/react-collapsible";
 import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { PlaceSuggestion } from "@/components/google autocomplete/place_suggestion_types";
+import { PlaceImage } from "@/components/google places/place_image";
 
 export default async function Page({
   params,
@@ -49,79 +51,78 @@ export default async function Page({
   }
 
   let parsedData: DestinationInfo;
+  let placeData: PlaceSuggestion;
+  let placeImg: PlaceImage
+
   try {
     parsedData = JSON.parse(travelData.data);
+    placeData = JSON.parse(parsedData.place_data);
+    placeImg = JSON.parse(parsedData.place_img);
   } catch (parseError) {
     console.error("Error parsing JSON data:", parseError);
     return <div>Error loading data.</div>;
   }
-  console.log(parsedData);
   // Fetch destination image
-  const photo = await getPexelsImage(parsedData.destination);
+  // const photo = await getPexelsImage(parsedData.destination);
+  // const photoResponse = await getPlaceImage(placeData.place_id);
+  const imgUrl = placeImg.imageUrl ?? null
 
   return (
-    <div className="flex justify-center">
-      <div className="flex flex-col w-full min-h-screen pb-20 max-w-7xl">
+    <div className="flex justify-center h-screen-minus-header overflow-scroll">
+      <div className="flex flex-col w-full overflow-scroll p-4 gap-4 ">
         {/* Hero Section with Background Image */}
-        <div className="relative h-[300px] w-full overflow-hidden">
-          {photo ? (
-            <>
-              {/* Base Image */}
+        {imgUrl ? (
+          <div className="w-full aspect-square relative rounded-lg">
+            {/* Base Image */}
+            <Image
+              src={imgUrl}
+              alt={`${parsedData.destination}`}
+              fill
+              className="object-cover rounded-lg"
+              priority
+            />
+            {/* Blurred Overlay */}
+            <div className="absolute inset-0">
               <Image
-                src={photo.src.large}
-                alt={`${parsedData.destination} from Pexels by ${photo.photographer}`}
+                src={imgUrl}
+                alt=""
                 fill
-                className="object-cover"
-                placeholder="blur"
-                blurDataURL={photo.src.tiny}
-                priority
-              />
-              {/* Blurred Overlay */}
-              <div className="absolute inset-0">
-                <Image
-                  src={photo.src.large}
-                  alt=""
-                  fill
-                  className="object-cover blur-xl scale-110"
-                  style={{
-                    maskImage:
-                      "linear-gradient(to bottom, transparent, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.8))",
-                    WebkitMaskImage:
-                      "linear-gradient(to bottom, transparent, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.8))",
-                  }}
-                />
-              </div>
-              {/* Gradient Overlay */}
-              <div
-                className="absolute inset-0"
+                className="object-cover blur-xl rounded-lg"
                 style={{
-                  background:
-                    "linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.6) 100%)",
-                  mixBlendMode: "multiply",
+                  maskImage:
+                    "linear-gradient(to bottom, transparent, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.8))",
+                  WebkitMaskImage:
+                    "linear-gradient(to bottom, transparent, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.8))",
                 }}
               />
-            </>
-          ) : (
-            <div className="absolute inset-0 bg-gray-200" />
-          )}
-          <div className="absolute inset-0 flex flex-col justify-end p-6 z-10">
-            <h1 className="text-4xl font-bold text-white drop-shadow-lg">
-              {parsedData.destination}
-            </h1>
-            <p className="mt-2 text-lg text-white/90 drop-shadow-md">
-              Discover the perfect blend of tradition and innovation
-            </p>
-            {photo?.photographer && (
-              <p className="text-sm mt-2 text-white/75">
-                Photo by {photo.photographer} on Pexels
+            </div>
+            {/* Gradient Overlay */}
+            <div
+              className="absolute inset-0 rounded-lg"
+              style={{
+                background:
+                  "linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.6) 100%)",
+                mixBlendMode: "multiply",
+              }}
+            />
+            <div className="absolute inset-0 flex flex-col justify-end p-6 z-10">
+              <h1 className="text-4xl font-bold text-white drop-shadow-lg">
+                {parsedData.destination}
+              </h1>
+              <p className="mt-2 text-lg text-white/90 drop-shadow-md">
+                Discover the perfect blend of tradition and innovation
               </p>
-            )}
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="relative w-full h-96 overflow-hidden">
+            <div className="absolute inset-0 bg-gray-200" >Image not loaded</div>
+          </div>
+        )}
 
         {/* Quick Info Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 px-6 relative z-10">
-          <div className="rounded-lg shadow-md p-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 relative z-10 ">
+          <div className="rounded-lg shadow-md p-4 dense-glass-card">
             <div className="flex items-center space-x-2">
               <ThermometerSun className="w-5 h-5 text-gray-500" />
               <div>
@@ -132,19 +133,8 @@ export default async function Page({
               </div>
             </div>
           </div>
-          <div className="rounded-lg shadow-md p-4">
-            <div className="flex items-center space-x-2">
-              <Clock className="w-5 h-5 text-gray-500" />
-              <div>
-                <p className="text-sm text-gray-600">Time Zone</p>
-                <p className="font-semibold">
-                  GMT{parsedData.weather?.source || "N/A"}
-                </p>
-              </div>
-            </div>
-          </div>
 
-          <div className="rounded-lg shadow-md p-4">
+          <div className="rounded-lg shadow-md p-4 dense-glass-card">
             <div className="flex items-center space-x-2">
               <Bus className="w-5 h-5 text-gray-500" />
               <div>
@@ -153,12 +143,26 @@ export default async function Page({
               </div>
             </div>
           </div>
+
+          <div className="rounded-lg shadow-md p-4 col-span-2 md:col-span-1 dense-glass-card">
+            <div className="flex items-center space-x-2">
+              <Clock className="w-5 h-5 text-gray-500" />
+              <div>
+                <p className="text-sm text-gray-600">Time Zone</p>
+                <p className="font-semibold">
+                  GMT <span className=" font-light text-sm line-clamp-2">{parsedData.weather?.source || "N/A"}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+
         </div>
 
         {/* Main Content Sections */}
-        <div className="px-6 py-8 space-y-6">
+        <div className="flex flex-col gap-4">
           {/* Cultural Background */}
-          <Collapsible className="w-full">
+          <Collapsible className="w-full dense-glass-card">
             <section className="rounded-lg shadow p-6 hover:shadow-lg transition-shadow w-full">
               <CollapsibleTrigger className="flex w-full text-left">
                 <h2 className="text-xl font-semibold mb-4 w-full">
@@ -175,7 +179,7 @@ export default async function Page({
           </Collapsible>
 
           {/* Transportation */}
-          <Collapsible className="w-full">
+          <Collapsible className="w-full dense-glass-card">
             <section className="rounded-lg shadow p-6 hover:shadow-lg transition-shadow w-full">
               <CollapsibleTrigger className="flex w-full text-left">
                 <h2 className="text-xl font-semibold mb-4 w-full">
@@ -237,7 +241,7 @@ export default async function Page({
           </Collapsible>
 
           {/* Districts */}
-          <Collapsible className="w-full">
+          <Collapsible className="w-full dense-glass-card">
             <section className="rounded-lg shadow p-6 hover:shadow-lg transition-shadow w-full">
               <CollapsibleTrigger className="flex w-full text-left">
                 <h2 className="text-xl font-semibold mb-4 w-full">
@@ -289,7 +293,7 @@ export default async function Page({
           </Collapsible>
 
           {/* Weather & Seasonal Info */}
-          <Collapsible className="w-full">
+          <Collapsible className="w-full dense-glass-card">
             <section className="rounded-lg shadow p-6 hover:shadow-lg transition-shadow w-full">
               <CollapsibleTrigger className="flex w-full text-left">
                 <h2 className="text-xl font-semibold mb-4 w-full">
@@ -328,7 +332,7 @@ export default async function Page({
           </Collapsible>
 
           {/* Practical Information */}
-          <Collapsible className="w-full">
+          <Collapsible className="w-full dense-glass-card">
             <section className="rounded-lg shadow p-6 hover:shadow-lg transition-shadow w-full">
               <CollapsibleTrigger className="flex w-full text-left">
                 <h2 className="text-xl font-semibold mb-4 w-full">
@@ -410,7 +414,7 @@ export default async function Page({
           </Collapsible>
 
           {/* Local Customs */}
-          <Collapsible className="w-full">
+          <Collapsible className="w-full dense-glass-card">
             <section className="rounded-lg shadow p-6 hover:shadow-lg transition-shadow w-full">
               <CollapsibleTrigger className="flex w-full text-left">
                 <h2 className="text-xl font-semibold mb-4 w-full">
@@ -434,7 +438,7 @@ export default async function Page({
           </Collapsible>
 
           {/* Food & Drinks */}
-          <Collapsible className="w-full">
+          <Collapsible className="w-full dense-glass-card">
             <section className="rounded-lg shadow p-6 hover:shadow-lg transition-shadow w-full">
               <CollapsibleTrigger className="flex w-full text-left">
                 <h2 className="text-xl font-semibold mb-4 w-full">
@@ -466,7 +470,7 @@ export default async function Page({
           </Collapsible>
 
           {/* Shopping */}
-          <Collapsible className="w-full">
+          <Collapsible className="w-full dense-glass-card">
             <section className="rounded-lg shadow p-6 hover:shadow-lg transition-shadow w-full">
               <CollapsibleTrigger className="flex w-full text-left">
                 <h2 className="text-xl font-semibold mb-4 w-full">Shopping</h2>
@@ -539,7 +543,7 @@ export default async function Page({
           </Collapsible>
 
           {/* Cost of Living */}
-          <Collapsible className="w-full">
+          <Collapsible className="w-full dense-glass-card">
             <section className="rounded-lg shadow p-6 hover:shadow-lg transition-shadow w-full">
               <CollapsibleTrigger className="flex w-full text-left">
                 <h2 className="text-xl font-semibold mb-4 w-full">
@@ -598,7 +602,7 @@ export default async function Page({
           </Collapsible>
 
           {/* Language Guide */}
-          <Collapsible className="w-full">
+          <Collapsible className="w-full dense-glass-card">
             <section className="rounded-lg shadow p-6 hover:shadow-lg transition-shadow w-full">
               <CollapsibleTrigger className="flex w-full text-left">
                 <h2 className="text-xl font-semibold mb-4 w-full">
@@ -648,7 +652,7 @@ export default async function Page({
           {/* Events & Festivals */}
           {parsedData.events_and_festivals &&
             parsedData.events_and_festivals.length > 0 && (
-              <Collapsible className="w-full">
+              <Collapsible className="w-full dense-glass-card">
                 <section className="rounded-lg shadow p-6 hover:shadow-lg transition-shadow w-full">
                   <CollapsibleTrigger className="flex w-full text-left">
                     <h2 className="text-xl font-semibold mb-4 w-full">

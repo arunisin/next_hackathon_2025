@@ -159,4 +159,6 @@ export const DestinationInfoSchema = z.object({
       )
       .optional(),
   }),
+  place_data: z.string(),
+  place_img: z.string()
 });

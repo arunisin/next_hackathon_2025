@@ -1,13 +1,14 @@
 import DeployButton from "@/components/deploy-button";
 import { EnvVarWarning } from "@/components/env-var-warning";
 import HeaderAuth from "@/components/header-auth";
-import { ThemeSwitcher } from "@/components/theme-switcher";
 import { hasEnvVars } from "@/utils/supabase/check-env-vars";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import Link from "next/link";
 import "./globals.css";
 import QueryClientWrapper from "../contexts/QueryClinet";
+import { AnimTransition } from "../components/transitions/AnimTransition";
+import BgImage from "@/components/common/bg-image";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -24,11 +25,13 @@ const geistSans = Geist({
   subsets: ["latin"],
 });
 
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <html lang="en" className={geistSans.className} suppressHydrationWarning>
       <head>
@@ -83,7 +86,9 @@ export default function RootLayout({
           `}
         </style>
       </head>
-      <body className="bg-background text-foreground">
+      <body
+        className="bg-background text-foreground h-screen"
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -91,18 +96,22 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <QueryClientWrapper>
-            <main>
-              <div>
-                <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
-                  <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm">
-                    <div className="flex gap-5 items-center font-semibold">
-                      <Link href={"/"}>TravelCulture</Link>
-                    </div>
-                    {!hasEnvVars ? <EnvVarWarning /> : <HeaderAuth />}
-                  </div>
-                </nav>
-                <div className="view-transition-page">{children}</div>
-                {/* <footer className="w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-8 py-16">
+            <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
+              <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm">
+                <div className="flex gap-5 items-center font-semibold">
+                  <Link href={"/"}>TravelCulture</Link>
+                </div>
+                {!hasEnvVars ? <EnvVarWarning /> : <HeaderAuth />}
+              </div>
+            </nav>
+            <BgImage />
+            <main className=" w-full h-screen-minus-header flex justify-center items-center">
+              {/* <AnimTransition> */}
+              <div className=" w-fill h-fill px-4 md:px-36">
+                {children}
+              </div>
+              {/* </AnimTransition> */}
+              {/* <footer className="w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-8 py-16">
                   <p>
                     Powered by{" "}
                     <a
@@ -116,7 +125,6 @@ export default function RootLayout({
                   </p>
                   <ThemeSwitcher />
                 </footer> */}
-              </div>
             </main>
           </QueryClientWrapper>
         </ThemeProvider>

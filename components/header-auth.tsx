@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { UserCircle } from "lucide-react";
+import { ThemeSwitcher } from "./theme-switcher";
 
 export default async function AuthButton() {
   const supabase = await createClient();
@@ -57,6 +58,7 @@ export default async function AuthButton() {
 
   return user ? (
     <div className="flex items-center gap-4">
+      <ThemeSwitcher />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="flex items-center gap-2">
@@ -80,12 +82,13 @@ export default async function AuthButton() {
     </div>
   ) : (
     <div className="flex gap-2">
-      <Button asChild size="sm" variant={"outline"}>
+      <ThemeSwitcher />
+        <Button asChild size="sm" variant={"default"}>
         <Link href="/sign-in">Sign in</Link>
       </Button>
-      <Button asChild size="sm" variant={"default"}>
+      {/* <Button asChild size="sm" variant={"default"}>
         <Link href="/sign-up">Sign up</Link>
-      </Button>
+      </Button> */}
     </div>
   );
 }

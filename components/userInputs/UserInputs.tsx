@@ -16,6 +16,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState, useCallback, useEffect } from "react";
 import { DateRange } from "react-day-picker";
 import { PlaneSvg } from "@/components/icons/plane"; // We'll create this next
+import { Input } from "../ui/input";
 
 const UserInputs = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -23,6 +24,7 @@ const UserInputs = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [place, setPlace] = useState<PlaceSuggestion | null>(null);
+  const [placeTemp, setPlaceTemp] = useState<string>("")
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
   const [showPlaneAnimation, setShowPlaneAnimation] = useState(false);
@@ -92,7 +94,8 @@ const UserInputs = () => {
     try {
       const gen = await ai_destination_info(
         place!.description as string,
-        dateRange!
+        dateRange!,
+        place!
       );
 
       if (gen.id) {
@@ -113,6 +116,10 @@ const UserInputs = () => {
       if (!place || !dateRange) {
         return;
       }
+      console.log('place', place);
+      if (!dateRange) {
+        return;
+      }
 
       const supabase = createClient();
       const {
@@ -129,8 +136,11 @@ const UserInputs = () => {
 
       const gen = await ai_destination_info(
         place.description as string,
-        dateRange
+        dateRange,
+        place
       );
+
+      console.log('placetemp', place);
 
       if (gen.id) {
         handleNavigation(gen.id);
@@ -146,18 +156,23 @@ const UserInputs = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4 relative">
+    <div className="flex flex-col gap-4 relative min-w-64">
       <PlaceAutocomplete
-        onPlaceSelect={(selectedPlace) => setPlace(selectedPlace)}
+        key={'place-autocomplete-input'}
+        onPlaceSelect={(selectedPlace) => {
+          console.log('selected', selectedPlace);
+          setPlace(selectedPlace)}
+        }
         initialValue={place?.description}
       />
+      {/* <Input onChange={(e) => setPlaceTemp(e.target.value)} /> */}
       <DatePickerWithRange
         onDateSelect={setDateRange}
         initialValue={dateRange}
       />
       <Button
         onClick={handleSubmit}
-        disabled={isSubmitting || !place || !dateRange}
+        // disabled={isSubmitting || !place || !dateRange}
         className="w-full"
       >
         {isSubmitting ? "Processing..." : "Let's go"}

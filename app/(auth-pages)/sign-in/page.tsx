@@ -8,25 +8,25 @@ import Link from "next/link";
 export default async function Login(props: { searchParams: Promise<Message> }) {
   const searchParams = await props.searchParams;
   return (
-    <div className="flex-1 flex flex-col min-w-64">
+    <div className="flex-1 flex flex-col min-w-64 w-full">
       <form className="flex-1 flex flex-col">
-        <h1 className="text-2xl font-medium">Sign in</h1>
-        <p className="text-sm text-foreground">
+        <h1 className="text-3xl font-semibold text-white">Sign in</h1>
+        <p className="text-md text-white">
           Don't have an account?{" "}
           <Link
-            className="text-foreground font-medium underline"
+            className="text-white font-medium underline"
             href="/sign-up"
           >
             Sign up
           </Link>
         </p>
         <div className="flex flex-col justify-center gap-2 [&>input]:mb-3 mt-8">
-          <Label htmlFor="email">Email</Label>
+          <Label className="text-white" htmlFor="email">Email</Label>
           <Input name="email" placeholder="you@example.com" required />
           <div className="flex justify-between items-center">
-            <Label htmlFor="password">Password</Label>
+            <Label className="text-white" htmlFor="password">Password</Label>
             <Link
-              className="text-xs text-foreground underline"
+              className="text-xs text-white underline"
               href="/forgot-password"
             >
               Forgot Password?
@@ -50,7 +50,7 @@ export default async function Login(props: { searchParams: Promise<Message> }) {
           <div className="w-full border-t border-muted-foreground/20"></div>
         </div>
         <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-background px-2 text-muted-foreground">
+          <span className="px-2 text-white">
             Or continue with
           </span>
         </div>

@@ -26,6 +26,37 @@ const ThemeSwitcher = () => {
   }
 
   const ICON_SIZE = 16;
+  const values = ["light", "dark", "system"]
+
+  return (<>
+    <Button 
+      onClick={() => {
+        const currentIndex = values.indexOf(theme ?? 'system');
+        const nextIndex = (currentIndex + 1) % values.length;
+        setTheme(values[nextIndex]);
+      }}
+     variant="ghost" size={"sm"}>
+      {theme === "light" ? (
+        <Sun
+          key="light"
+          size={ICON_SIZE}
+          className={"text-muted-foreground"}
+        />
+      ) : theme === "dark" ? (
+        <Moon
+          key="dark"
+          size={ICON_SIZE}
+          className={"text-muted-foreground"}
+        />
+      ) : (
+        <Laptop
+          key="system"
+          size={ICON_SIZE}
+          className={"text-muted-foreground"}
+        />
+      )}
+    </Button>
+  </>)
 
   return (
     <DropdownMenu>

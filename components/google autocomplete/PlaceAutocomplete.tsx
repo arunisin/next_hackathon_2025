@@ -39,6 +39,7 @@ const PlaceAutocomplete = ({
   } = usePlaceSuggestion();
 
   const handleSelect = (place: any) => {
+    console.log('place', place);
     setQuery(place.description);
     setInputValue(place.description);
     setOpen(false);
@@ -109,7 +110,7 @@ const PlaceAutocomplete = ({
                 <CommandGroup>
                   {suggestions.map((place) => (
                     <CommandItem
-                      key={place.id}
+                      key={`dropdownList-suggestion-${place.place_id}`}
                       value={place.description}
                       onSelect={() => handleSelect(place)}
                       className="cursor-pointer"

@@ -216,3 +216,39 @@ export async function getPexelsImage(query: string) {
     return null;
   }
 }
+
+export async function getPlaceImage(placeId: string) {
+  try {
+    const apiKey = process.env.GOOGLE_MAPS_API_KEY || "";
+
+    // Step 1: Fetch place info using new Places API v1
+    const detailsRes = await fetch(
+      `https://places.googleapis.com/v1/places/${placeId}?fields=photos`,
+      {
+        headers: {
+          "X-Goog-Api-Key": apiKey,
+          "X-Goog-FieldMask": "photos",
+        },
+      }
+    );
+
+    if (!detailsRes.ok) {
+      throw new Error("Failed to fetch place details");
+    }
+
+    const detailsData = await detailsRes.json();
+    const photoRef = detailsData.photos?.[0]?.name?.split("/").pop(); // Extract PHOTO_REFERENCE
+
+    if (!photoRef) {
+      return null;
+    }
+
+    // Step 2: Construct new photo URL
+    const imageUrl = `https://places.googleapis.com/v1/places/${placeId}/photos/${photoRef}/media?maxWidthPx=800&key=${apiKey}`;
+
+    return { imageUrl, photoReference: photoRef };
+  } catch (error) {
+    console.error("Error fetching Google Places image (v1):", error);
+    return null;
+  }
+}
