@@ -22,14 +22,14 @@ export function AnimTransition({ children }: { children: React.ReactNode }) {
             const timer = setTimeout(() => {
                 setCurrentChildren(children);
                 setTransitionStage('enter');
-            }, 200);
+            }, 100);
             return () => clearTimeout(timer);
         }
     }, [transitionStage, children]);
 
     return (
         <div className={cn(
-            "flex justify-center items-center backdrop-blur-sm bg-white/20 dark:bg-black/30 p-6 rounded-lg border dark:border-white/5 border-white/10 shadow-lg md:w-1/4 w-[90%]",
+            "flex justify-center items-center backdrop-blur-sm bg-white/20 dark:bg-black/30 m-6 rounded-lg border dark:border-white/5 border-white/10 shadow-lg",
             transitionStage === 'enter' ? 'animate-slide-in' : 'animate-slide-out'
         )}>
             {currentChildren}

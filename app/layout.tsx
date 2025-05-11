@@ -86,8 +86,8 @@ export default function RootLayout({
           `}
         </style>
       </head>
-      <body 
-        className="bg-background text-foreground"
+      <body
+        className="bg-background text-foreground h-screen"
       >
         <ThemeProvider
           attribute="class"
@@ -96,23 +96,22 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <QueryClientWrapper>
-            <main>
-              <div>
-                <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
-                  <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm">
-                    <div className="flex gap-5 items-center font-semibold">
-                      <Link href={"/"}>TravelCulture</Link>
-                    </div>
-                    {!hasEnvVars ? <EnvVarWarning /> : <HeaderAuth />}
-                  </div>
-                </nav>
-                <BgImage>
-                  <AnimTransition>
-                    {children}
-                  </AnimTransition>
-                </BgImage>
+            <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
+              <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm">
+                <div className="flex gap-5 items-center font-semibold">
+                  <Link href={"/"}>TravelCulture</Link>
                 </div>
-                {/* <footer className="w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-8 py-16">
+                {!hasEnvVars ? <EnvVarWarning /> : <HeaderAuth />}
+              </div>
+            </nav>
+            <BgImage />
+            <main className=" w-full h-screen-minus-header flex justify-center items-center">
+              {/* <AnimTransition> */}
+              <div className=" w-fit h-fit md:px-36">
+                {children}
+              </div>
+              {/* </AnimTransition> */}
+              {/* <footer className="w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-8 py-16">
                   <p>
                     Powered by{" "}
                     <a

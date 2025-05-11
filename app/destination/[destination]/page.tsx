@@ -59,11 +59,12 @@ export default async function Page({
   // Fetch destination image
   const photo = await getPexelsImage(parsedData.destination);
 
+
   return (
-    <div className="flex justify-center">
-      <div className="flex flex-col w-full min-h-screen pb-20 max-w-7xl">
+    <div className="flex justify-center h-screen-minus-header">
+      <div className="flex flex-col w-full overflow-scroll my-8 p-4 gap-4 light-glass-card">
         {/* Hero Section with Background Image */}
-        <div className="relative h-[300px] w-full overflow-hidden">
+        {photo ? <div className="relative w-full overflow-hidden">
           {photo ? (
             <>
               {/* Base Image */}
@@ -117,11 +118,11 @@ export default async function Page({
               </p>
             )}
           </div>
-        </div>
+        </div> : null}
 
         {/* Quick Info Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 px-6 relative z-10">
-          <div className="rounded-lg shadow-md p-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 relative z-10 ">
+          <div className="rounded-lg shadow-md p-4 dense-glass-card">
             <div className="flex items-center space-x-2">
               <ThermometerSun className="w-5 h-5 text-gray-500" />
               <div>
@@ -132,7 +133,7 @@ export default async function Page({
               </div>
             </div>
           </div>
-          <div className="rounded-lg shadow-md p-4">
+          <div className="rounded-lg shadow-md p-4 dense-glass-card">
             <div className="flex items-center space-x-2">
               <Clock className="w-5 h-5 text-gray-500" />
               <div>
@@ -144,7 +145,7 @@ export default async function Page({
             </div>
           </div>
 
-          <div className="rounded-lg shadow-md p-4">
+          <div className="rounded-lg shadow-md p-4 dense-glass-card">
             <div className="flex items-center space-x-2">
               <Bus className="w-5 h-5 text-gray-500" />
               <div>
@@ -156,9 +157,9 @@ export default async function Page({
         </div>
 
         {/* Main Content Sections */}
-        <div className="px-6 py-8 space-y-6">
+        <div className="flex flex-col gap-4">
           {/* Cultural Background */}
-          <Collapsible className="w-full">
+          <Collapsible className="w-full dense-glass-card">
             <section className="rounded-lg shadow p-6 hover:shadow-lg transition-shadow w-full">
               <CollapsibleTrigger className="flex w-full text-left">
                 <h2 className="text-xl font-semibold mb-4 w-full">
@@ -175,7 +176,7 @@ export default async function Page({
           </Collapsible>
 
           {/* Transportation */}
-          <Collapsible className="w-full">
+          <Collapsible className="w-full dense-glass-card">
             <section className="rounded-lg shadow p-6 hover:shadow-lg transition-shadow w-full">
               <CollapsibleTrigger className="flex w-full text-left">
                 <h2 className="text-xl font-semibold mb-4 w-full">
@@ -237,7 +238,7 @@ export default async function Page({
           </Collapsible>
 
           {/* Districts */}
-          <Collapsible className="w-full">
+          <Collapsible className="w-full dense-glass-card">
             <section className="rounded-lg shadow p-6 hover:shadow-lg transition-shadow w-full">
               <CollapsibleTrigger className="flex w-full text-left">
                 <h2 className="text-xl font-semibold mb-4 w-full">
@@ -289,7 +290,7 @@ export default async function Page({
           </Collapsible>
 
           {/* Weather & Seasonal Info */}
-          <Collapsible className="w-full">
+          <Collapsible className="w-full dense-glass-card">
             <section className="rounded-lg shadow p-6 hover:shadow-lg transition-shadow w-full">
               <CollapsibleTrigger className="flex w-full text-left">
                 <h2 className="text-xl font-semibold mb-4 w-full">
@@ -328,7 +329,7 @@ export default async function Page({
           </Collapsible>
 
           {/* Practical Information */}
-          <Collapsible className="w-full">
+          <Collapsible className="w-full dense-glass-card">
             <section className="rounded-lg shadow p-6 hover:shadow-lg transition-shadow w-full">
               <CollapsibleTrigger className="flex w-full text-left">
                 <h2 className="text-xl font-semibold mb-4 w-full">
@@ -410,7 +411,7 @@ export default async function Page({
           </Collapsible>
 
           {/* Local Customs */}
-          <Collapsible className="w-full">
+          <Collapsible className="w-full dense-glass-card">
             <section className="rounded-lg shadow p-6 hover:shadow-lg transition-shadow w-full">
               <CollapsibleTrigger className="flex w-full text-left">
                 <h2 className="text-xl font-semibold mb-4 w-full">
@@ -434,7 +435,7 @@ export default async function Page({
           </Collapsible>
 
           {/* Food & Drinks */}
-          <Collapsible className="w-full">
+          <Collapsible className="w-full dense-glass-card">
             <section className="rounded-lg shadow p-6 hover:shadow-lg transition-shadow w-full">
               <CollapsibleTrigger className="flex w-full text-left">
                 <h2 className="text-xl font-semibold mb-4 w-full">
@@ -466,7 +467,7 @@ export default async function Page({
           </Collapsible>
 
           {/* Shopping */}
-          <Collapsible className="w-full">
+          <Collapsible className="w-full dense-glass-card">
             <section className="rounded-lg shadow p-6 hover:shadow-lg transition-shadow w-full">
               <CollapsibleTrigger className="flex w-full text-left">
                 <h2 className="text-xl font-semibold mb-4 w-full">Shopping</h2>
@@ -539,7 +540,7 @@ export default async function Page({
           </Collapsible>
 
           {/* Cost of Living */}
-          <Collapsible className="w-full">
+          <Collapsible className="w-full dense-glass-card">
             <section className="rounded-lg shadow p-6 hover:shadow-lg transition-shadow w-full">
               <CollapsibleTrigger className="flex w-full text-left">
                 <h2 className="text-xl font-semibold mb-4 w-full">
@@ -598,7 +599,7 @@ export default async function Page({
           </Collapsible>
 
           {/* Language Guide */}
-          <Collapsible className="w-full">
+          <Collapsible className="w-full dense-glass-card">
             <section className="rounded-lg shadow p-6 hover:shadow-lg transition-shadow w-full">
               <CollapsibleTrigger className="flex w-full text-left">
                 <h2 className="text-xl font-semibold mb-4 w-full">
@@ -648,7 +649,7 @@ export default async function Page({
           {/* Events & Festivals */}
           {parsedData.events_and_festivals &&
             parsedData.events_and_festivals.length > 0 && (
-              <Collapsible className="w-full">
+            <Collapsible className="w-full dense-glass-card">
                 <section className="rounded-lg shadow p-6 hover:shadow-lg transition-shadow w-full">
                   <CollapsibleTrigger className="flex w-full text-left">
                     <h2 className="text-xl font-semibold mb-4 w-full">

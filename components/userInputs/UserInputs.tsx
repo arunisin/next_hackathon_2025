@@ -16,6 +16,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState, useCallback, useEffect } from "react";
 import { DateRange } from "react-day-picker";
 import { PlaneSvg } from "@/components/icons/plane"; // We'll create this next
+import { Input } from "../ui/input";
 
 const UserInputs = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -23,6 +24,7 @@ const UserInputs = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [place, setPlace] = useState<PlaceSuggestion | null>(null);
+  const [placeTemp, setPlaceTemp] = useState<string>("")
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
   const [showPlaneAnimation, setShowPlaneAnimation] = useState(false);
@@ -110,7 +112,10 @@ const UserInputs = () => {
 
   const handleSubmit = async () => {
     try {
-      if (!place || !dateRange) {
+      // if (!place || !dateRange) {
+      //   return;
+      // }
+      if (!dateRange) {
         return;
       }
 
@@ -127,8 +132,13 @@ const UserInputs = () => {
       setIsSubmitting(true);
       setError(null);
 
+      // const gen = await ai_destination_info(
+      //   place.description as string,
+      //   dateRange
+      // );
+
       const gen = await ai_destination_info(
-        place.description as string,
+        placeTemp as string,
         dateRange
       );
 
@@ -146,18 +156,19 @@ const UserInputs = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4 relative">
-      <PlaceAutocomplete
+    <div className="flex flex-col gap-4 relative min-w-64">
+      {/* <PlaceAutocomplete
         onPlaceSelect={(selectedPlace) => setPlace(selectedPlace)}
         initialValue={place?.description}
-      />
+      /> */}
+      <Input onChange={(e) => setPlaceTemp(e.target.value)} />
       <DatePickerWithRange
         onDateSelect={setDateRange}
         initialValue={dateRange}
       />
       <Button
         onClick={handleSubmit}
-        disabled={isSubmitting || !place || !dateRange}
+        // disabled={isSubmitting || !place || !dateRange}
         className="w-full"
       >
         {isSubmitting ? "Processing..." : "Let's go"}
