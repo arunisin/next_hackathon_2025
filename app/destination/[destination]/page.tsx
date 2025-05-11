@@ -58,11 +58,12 @@ export default async function Page({
   console.log(parsedData);
   // Fetch destination image
   const photo = await getPexelsImage(parsedData.destination);
+  // const photo = await getPlaceImage(parsedData.destination);
 
 
   return (
     <div className="flex justify-center h-screen-minus-header">
-      <div className="flex flex-col w-full overflow-scroll my-8 p-4 gap-4 light-glass-card">
+      <div className="flex flex-col w-full overflow-scroll mb-4 p-4 gap-4 ">
         {/* Hero Section with Background Image */}
         {photo ? <div className="relative w-full overflow-hidden">
           {photo ? (
@@ -133,17 +134,6 @@ export default async function Page({
               </div>
             </div>
           </div>
-          <div className="rounded-lg shadow-md p-4 dense-glass-card">
-            <div className="flex items-center space-x-2">
-              <Clock className="w-5 h-5 text-gray-500" />
-              <div>
-                <p className="text-sm text-gray-600">Time Zone</p>
-                <p className="font-semibold">
-                  GMT{parsedData.weather?.source || "N/A"}
-                </p>
-              </div>
-            </div>
-          </div>
 
           <div className="rounded-lg shadow-md p-4 dense-glass-card">
             <div className="flex items-center space-x-2">
@@ -154,6 +144,20 @@ export default async function Page({
               </div>
             </div>
           </div>
+
+          <div className="rounded-lg shadow-md p-4 col-span-2 md:col-span-1 dense-glass-card">
+            <div className="flex items-center space-x-2">
+              <Clock className="w-5 h-5 text-gray-500" />
+              <div>
+                <p className="text-sm text-gray-600">Time Zone</p>
+                <p className="font-semibold">
+                  GMT <span className=" font-light text-sm line-clamp-2">{parsedData.weather?.source || "N/A"}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          
         </div>
 
         {/* Main Content Sections */}

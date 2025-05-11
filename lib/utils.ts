@@ -219,7 +219,7 @@ export async function getPexelsImage(query: string) {
 
 export async function getPlaceImage(placeId: string) {
   try {
-    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY || "";
+    const apiKey = process.env.GOOGLE_MAPS_API_KEY || "";
 
     // Step 1: Fetch place info using new Places API v1
     const detailsRes = await fetch(
