@@ -94,7 +94,8 @@ const UserInputs = () => {
     try {
       const gen = await ai_destination_info(
         place!.description as string,
-        dateRange!
+        dateRange!,
+        place!
       );
 
       if (gen.id) {
@@ -112,9 +113,10 @@ const UserInputs = () => {
 
   const handleSubmit = async () => {
     try {
-      // if (!place || !dateRange) {
-      //   return;
-      // }
+      if (!place || !dateRange) {
+        return;
+      }
+      console.log('place', place);
       if (!dateRange) {
         return;
       }
@@ -132,15 +134,13 @@ const UserInputs = () => {
       setIsSubmitting(true);
       setError(null);
 
-      // const gen = await ai_destination_info(
-      //   place.description as string,
-      //   dateRange
-      // );
-
       const gen = await ai_destination_info(
-        placeTemp as string,
-        dateRange
+        place.description as string,
+        dateRange,
+        place
       );
+
+      console.log('placetemp', place);
 
       if (gen.id) {
         handleNavigation(gen.id);
@@ -157,11 +157,15 @@ const UserInputs = () => {
 
   return (
     <div className="flex flex-col gap-4 relative min-w-64">
-      {/* <PlaceAutocomplete
-        onPlaceSelect={(selectedPlace) => setPlace(selectedPlace)}
+      <PlaceAutocomplete
+        key={'place-autocomplete-input'}
+        onPlaceSelect={(selectedPlace) => {
+          console.log('selected', selectedPlace);
+          setPlace(selectedPlace)}
+        }
         initialValue={place?.description}
-      /> */}
-      <Input onChange={(e) => setPlaceTemp(e.target.value)} />
+      />
+      {/* <Input onChange={(e) => setPlaceTemp(e.target.value)} /> */}
       <DatePickerWithRange
         onDateSelect={setDateRange}
         initialValue={dateRange}

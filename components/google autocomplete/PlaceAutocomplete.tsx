@@ -110,7 +110,7 @@ const PlaceAutocomplete = ({
                 <CommandGroup>
                   {suggestions.map((place) => (
                     <CommandItem
-                      key={place.id}
+                      key={`dropdownList-suggestion-${place.place_id}`}
                       value={place.description}
                       onSelect={() => handleSelect(place)}
                       className="cursor-pointer"
