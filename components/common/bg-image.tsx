@@ -2,13 +2,18 @@
 import { bgImages } from "@/lib/constants/images";
 import { useTheme } from "next-themes";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 export default function BgImage() {
     const { theme, systemTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
     const selectedImage = useRef(bgImages[Math.floor(Math.random() * bgImages.length)]);
+    const pathname = usePathname()
 
+    const blurImage = pathname !== '/'
+
+    console.log(pathname);
     useEffect(() => {
         setMounted(true); // Ensures this only renders client-side
     }, []);
@@ -27,7 +32,7 @@ export default function BgImage() {
 
     return (
         <div className="absolute w-full h-screen-minus-header -z-10 overflow-hidden">
-            <Image fill src={mob_url} className=" flex md:hidden -z-10 absolute object-cover" alt="background image" />
+            <Image fill src={mob_url} className={`flex md:hidden -z-10 absolute object-cover ${blurImage ? "blur-sm scale-105" : ""}`} alt="background image" />
             <Image fill src={desk_url} className=" hidden md:flex -z-10 absolute object-cover" alt="background image" />
         </div>
     );
