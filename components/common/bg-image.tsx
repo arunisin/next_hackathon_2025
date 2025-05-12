@@ -13,7 +13,6 @@ export default function BgImage() {
 
     const blurImage = pathname !== '/'
 
-    console.log(pathname);
     useEffect(() => {
         setMounted(true); // Ensures this only renders client-side
     }, []);
