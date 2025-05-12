@@ -17,17 +17,16 @@ import React, { useState, useCallback, useEffect } from "react";
 import { DateRange } from "react-day-picker";
 import { PlaneSvg } from "@/components/icons/plane"; // We'll create this next
 import { Input } from "../ui/input";
+import { MonthSelector } from "../date picker/MonthSelector";
 
 const UserInputs = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSignInDialog, setShowSignInDialog] = useState(false);
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [place, setPlace] = useState<PlaceSuggestion | null>(null);
-  const [placeTemp, setPlaceTemp] = useState<string>("")
-  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
   const [showPlaneAnimation, setShowPlaneAnimation] = useState(false);
+  const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -41,29 +40,23 @@ const UserInputs = () => {
       }
 
       if (fromDate && toDate) {
-        setDateRange({
-          from: new Date(fromDate),
-          to: new Date(toDate),
-        });
+        setSelectedMonth(null)
       }
     }
   }, []);
 
   const handleSignIn = useCallback(() => {
-    if (!place || !dateRange) return;
+    if (!place || !selectedMonth) return;
 
     const params = new URLSearchParams();
     params.set("destination", place.description as string);
-    if (dateRange.from) {
-      params.set("from", dateRange.from.toISOString());
-    }
-    if (dateRange.to) {
-      params.set("to", dateRange.to.toISOString());
+    if (selectedMonth) {
+      params.set("month", selectedMonth);
     }
     params.set("redirect_to", "/protected");
 
     router.push(`/sign-in?${params.toString()}`);
-  }, [place, dateRange, router]);
+  }, [place, selectedMonth, router]);
 
   const handleNavigation = useCallback(async (id: string) => {
     const url = `/destination/${id}`;
@@ -94,7 +87,7 @@ const UserInputs = () => {
     try {
       const gen = await ai_destination_info(
         place!.description as string,
-        dateRange!,
+        selectedMonth!,
         place!
       );
 
@@ -113,11 +106,7 @@ const UserInputs = () => {
 
   const handleSubmit = async () => {
     try {
-      if (!place || !dateRange) {
-        return;
-      }
-      console.log('place', place);
-      if (!dateRange) {
+      if (!place || !selectedMonth) {
         return;
       }
 
@@ -136,7 +125,7 @@ const UserInputs = () => {
 
       const gen = await ai_destination_info(
         place.description as string,
-        dateRange,
+        selectedMonth,
         place
       );
 
@@ -166,10 +155,7 @@ const UserInputs = () => {
         initialValue={place?.description}
       />
       {/* <Input onChange={(e) => setPlaceTemp(e.target.value)} /> */}
-      <DatePickerWithRange
-        onDateSelect={setDateRange}
-        initialValue={dateRange}
-      />
+      <MonthSelector selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} />
       <Button
         onClick={handleSubmit}
         // disabled={isSubmitting || !place || !dateRange}

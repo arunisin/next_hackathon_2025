@@ -215,14 +215,14 @@ export const place_suggestion = async (query: string) => {
 
 export const ai_destination_info = async (
   destination: string,
-  duration: DateRange,
+  month: string,
   place: PlaceSuggestion
 ) => {
   const currentDate = new Date();
   const { text } = await generateText({
     model: openai("gpt-4o"),
     system: systemPrompt,
-    prompt: `Create a comprehensive travel guide for ${destination} for a trip from ${duration.from} to ${duration.to}.
+    prompt: `Create a comprehensive travel guide for ${destination} for a trip in ${month}.
 
 Please provide extensive details for each section, including:
 - Current seasonal weather patterns and climate information
