@@ -67,66 +67,69 @@ export default async function Page({
   // const photoResponse = await getPlaceImage(placeData.place_id);
   const imgUrl = placeImg.imageUrl ?? null
 
-  return (
-    <div className="flex justify-center h-screen-minus-header overflow-scroll">
-      <div className="flex flex-col w-full overflow-scroll p-4 gap-4 ">
-        {/* Hero Section with Background Image */}
-        {imgUrl ? (
-          <div className="w-full aspect-square relative rounded-lg">
-            {/* Base Image */}
-            <Image
-              src={imgUrl}
-              alt={`${parsedData.destination}`}
-              fill
-              className="object-cover rounded-lg"
-              priority
-            />
-            {/* Blurred Overlay */}
-            <div className="absolute inset-0">
-              <Image
-                src={imgUrl}
-                alt=""
-                fill
-                className="object-cover blur-xl rounded-lg"
-                style={{
-                  maskImage:
-                    "linear-gradient(to bottom, transparent, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.8))",
-                  WebkitMaskImage:
-                    "linear-gradient(to bottom, transparent, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.8))",
-                }}
-              />
-            </div>
-            {/* Gradient Overlay */}
-            <div
-              className="absolute inset-0 rounded-lg"
-              style={{
-                background:
-                  "linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.6) 100%)",
-                mixBlendMode: "multiply",
-              }}
-            />
-            <div className="absolute inset-0 flex flex-col justify-end p-6 z-10">
-              <h1 className="text-4xl font-bold text-white drop-shadow-lg">
-                {parsedData.destination}
-              </h1>
-              <p className="mt-2 text-lg text-white/90 drop-shadow-md">
-                Discover the perfect blend of tradition and innovation
-              </p>
-            </div>
-          </div>
-        ) : (
-          <div className="relative w-full h-96 overflow-hidden">
-            <div className="absolute inset-0 bg-gray-200" >Image not loaded</div>
-          </div>
-        )}
+  console.log('parsedData.weather', parsedData.weather);
 
+  return (
+    <div className="flex flex-col justify-center text-white h-screen-minus-header overflow-scroll">
+      {imgUrl ? (
+        <div
+          className="w-full aspect-square relative"
+          style={{
+            WebkitMaskImage:
+              "linear-gradient(to bottom, black 60%, transparent 100%)",
+            maskImage: "linear-gradient(to bottom, black 60%, transparent 100%)",
+            WebkitMaskRepeat: "no-repeat",
+            maskRepeat: "no-repeat",
+          }}
+        >
+          {/* Base Image */}
+          <Image
+            src={imgUrl}
+            alt={`${parsedData.destination}`}
+            fill
+            className="object-cover"
+            priority
+          />
+
+          {/* Gradient Overlay */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.7) 100%)",
+              mixBlendMode: "multiply",
+            }}
+          />
+
+          {/* Content */}
+          <div className="absolute flex flex-col justify-end p-6 z-10">
+            <h1 className="text-4xl font-bold text-white drop-shadow-lg">
+              {parsedData.destination}
+            </h1>
+            <p className="mt-2 text-lg text-white/90 drop-shadow-md">
+              Discover the perfect blend of tradition and innovation
+            </p>
+          </div>
+      </div>
+      ) : (
+        <div className="relative w-full h-96 overflow-hidden">
+          <div className="absolute inset-0 bg-gray-200" >Image not loaded</div>
+        </div>
+      )}
+
+      <div className="flex fade-top-mask -mt-72 pt-24 z-10 flex-col w-full overflow-scroll p-4 gap-4 ">
+        {/* Hero Section with Background Image */}
+        
         {/* Quick Info Cards */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 relative z-10 ">
           <div className="rounded-lg shadow-md p-4 dense-glass-card">
             <div className="flex items-center space-x-2">
-              <ThermometerSun className="w-5 h-5 text-gray-500" />
-              <div>
-                <p className="text-sm text-gray-600">Weather</p>
+              <div className=" flex flex-col gap-2">
+                <div className=" flex gap-2">
+                  <ThermometerSun className="w-5 h-5 text-white" />
+                  <p className="text-md font-bold ">Weather</p>
+                </div>
+                <hr className=" bg-white" />
                 <p className="font-semibold">
                   {parsedData.weather?.temperature_range}
                 </p>
@@ -138,7 +141,7 @@ export default async function Page({
             <div className="flex items-center space-x-2">
               <Bus className="w-5 h-5 text-gray-500" />
               <div>
-                <p className="text-sm text-gray-600">Transport</p>
+                <p className="text-sm ">Transport</p>
                 <p className="font-semibold">Available</p>
               </div>
             </div>
@@ -148,7 +151,7 @@ export default async function Page({
             <div className="flex items-center space-x-2">
               <Clock className="w-5 h-5 text-gray-500" />
               <div>
-                <p className="text-sm text-gray-600">Time Zone</p>
+                <p className="text-sm ">Time Zone</p>
                 <p className="font-semibold">
                   GMT <span className=" font-light text-sm line-clamp-2">{parsedData.weather?.source || "N/A"}</span>
                 </p>
@@ -171,7 +174,7 @@ export default async function Page({
                 <ChevronsUpDown className="h-4 w-4" />
               </CollapsibleTrigger>
               <CollapsibleContent className="w-full">
-                <p className="text-gray-600">
+                <p className="">
                   {parsedData.culture?.background}
                 </p>
               </CollapsibleContent>
@@ -199,7 +202,7 @@ export default async function Page({
                           <h4 className="font-medium text-gray-800">
                             {transport.type}
                           </h4>
-                          <p className="text-gray-600 mt-1">
+                          <p className=" mt-1">
                             {transport.description}
                           </p>
                           <p className="text-gray-500 mt-2">
@@ -217,7 +220,7 @@ export default async function Page({
                   <ul className="list-disc pl-4 space-y-2">
                     {parsedData.transportation?.getting_from_airport.map(
                       (tip, index) => (
-                        <li key={index} className="text-gray-600">
+                        <li key={index} className="">
                           {tip}
                         </li>
                       )
@@ -230,7 +233,7 @@ export default async function Page({
                   </h3>
                   <ul className="list-disc pl-4 space-y-2">
                     {parsedData.transportation?.local_tips.map((tip, index) => (
-                      <li key={index} className="text-gray-600">
+                      <li key={index} className="">
                         {tip}
                       </li>
                     ))}
@@ -256,7 +259,7 @@ export default async function Page({
                       <h3 className="font-medium text-gray-800 mb-2">
                         {district.name}
                       </h3>
-                      <p className="text-gray-600 mb-3">
+                      <p className=" mb-3">
                         {district.description}
                       </p>
                       <div className="space-y-2">
@@ -266,7 +269,7 @@ export default async function Page({
                           </h4>
                           <ul className="list-disc pl-4">
                             {district.known_for.map((item, i) => (
-                              <li key={i} className="text-gray-600">
+                              <li key={i} className="">
                                 {item}
                               </li>
                             ))}
@@ -278,7 +281,7 @@ export default async function Page({
                           </h4>
                           <ul className="list-disc pl-4">
                             {district.highlights.map((item, i) => (
-                              <li key={i} className="text-gray-600">
+                              <li key={i} className="">
                                 {item}
                               </li>
                             ))}
@@ -302,7 +305,7 @@ export default async function Page({
                 <ChevronsUpDown className="h-4 w-4" />
               </CollapsibleTrigger>
               <CollapsibleContent className="w-full">
-                <p className="text-gray-600 mb-4">
+                <p className=" mb-4">
                   {parsedData.weather?.description}
                 </p>
                 <div className="grid md:grid-cols-2 gap-4">
@@ -311,7 +314,7 @@ export default async function Page({
                       <h3 className="font-medium text-gray-800 mb-2">
                         {season.season}
                       </h3>
-                      <p className="text-gray-600 mb-2">{season.description}</p>
+                      <p className=" mb-2">{season.description}</p>
                       <div className="grid grid-cols-2 gap-2 text-sm">
                         <div>
                           <span className="text-gray-500">Temperature:</span>
@@ -345,7 +348,7 @@ export default async function Page({
                   <h3 className="font-medium text-gray-800 mb-2">
                     Visa Requirements
                   </h3>
-                  <p className="text-gray-600">
+                  <p className="">
                     {parsedData.practical_info?.visa_requirements}
                   </p>
                 </div>
@@ -356,7 +359,7 @@ export default async function Page({
                   <ul className="list-disc pl-4 space-y-2">
                     {parsedData.practical_info?.health_safety.map(
                       (tip, index) => (
-                        <li key={index} className="text-gray-600">
+                        <li key={index} className="">
                           {tip}
                         </li>
                       )
@@ -374,7 +377,7 @@ export default async function Page({
                           <p className="font-medium text-gray-700">
                             {contact.service}
                           </p>
-                          <p className="text-gray-600">{contact.number}</p>
+                          <p className="">{contact.number}</p>
                         </div>
                       )
                     )}
@@ -385,22 +388,22 @@ export default async function Page({
                     Best Time to Visit
                   </h3>
                   <div className="space-y-2">
-                    <p className="text-gray-600">
+                    <p className="">
                       <span className="font-medium">General:</span>{" "}
                       {parsedData.practical_info?.best_time_to_visit.general}
                     </p>
-                    <p className="text-gray-600">
+                    <p className="">
                       <span className="font-medium">Peak Season:</span>{" "}
                       {
                         parsedData.practical_info?.best_time_to_visit
                           .peak_season
                       }
                     </p>
-                    <p className="text-gray-600">
+                    <p className="">
                       <span className="font-medium">Off Season:</span>{" "}
                       {parsedData.practical_info?.best_time_to_visit.off_season}
                     </p>
-                    <p className="text-gray-600">
+                    <p className="">
                       <span className="font-medium">Shoulder Season:</span>{" "}
                       {
                         parsedData.practical_info?.best_time_to_visit
@@ -428,7 +431,7 @@ export default async function Page({
                     (custom: string, index: number) => (
                       <li key={index} className="flex items-start">
                         <span className="mr-2 text-primary">•</span>
-                        <span className="text-gray-600">{custom}</span>
+                        <span className="">{custom}</span>
                       </li>
                     )
                   )}
@@ -452,7 +455,7 @@ export default async function Page({
                     <h3 className="font-medium text-gray-800 mb-2">
                       Local Cuisine
                     </h3>
-                    <p className="text-gray-600">
+                    <p className="">
                       {parsedData.food_and_drinks?.local_cuisine?.join(", ")}
                     </p>
                   </div>
@@ -460,7 +463,7 @@ export default async function Page({
                     <h3 className="font-medium text-gray-800 mb-2">
                       Must-try Drinks
                     </h3>
-                    <p className="text-gray-600">
+                    <p className="">
                       {parsedData.food_and_drinks?.must_try_drinks?.join(", ")}
                     </p>
                   </div>
@@ -487,7 +490,7 @@ export default async function Page({
                         <h4 className="font-medium text-gray-800">
                           {market.name}
                         </h4>
-                        <p className="text-gray-600 mt-1">
+                        <p className=" mt-1">
                           {market.description}
                         </p>
                         <p className="text-gray-500 mt-2">
@@ -504,7 +507,7 @@ export default async function Page({
                           </h5>
                           <ul className="list-disc pl-4">
                             {market.specialties.map((specialty, i) => (
-                              <li key={i} className="text-gray-600">
+                              <li key={i} className="">
                                 {specialty}
                               </li>
                             ))}
@@ -521,7 +524,7 @@ export default async function Page({
                   <div className="grid md:grid-cols-3 gap-4">
                     {parsedData.shopping?.souvenirs.map((souvenir, index) => (
                       <div key={index} className="bg-gray-50 p-3 rounded">
-                        <p className="text-gray-600">{souvenir}</p>
+                        <p className="">{souvenir}</p>
                       </div>
                     ))}
                   </div>
@@ -533,7 +536,7 @@ export default async function Page({
                   <div className="grid md:grid-cols-2 gap-4">
                     {parsedData.shopping?.shopping_areas.map((area, index) => (
                       <div key={index} className="bg-gray-50 p-3 rounded">
-                        <p className="text-gray-600">{area}</p>
+                        <p className="">{area}</p>
                       </div>
                     ))}
                   </div>
@@ -588,7 +591,7 @@ export default async function Page({
                           key={index}
                           className="bg-gray-50 p-3 rounded flex justify-between"
                         >
-                          <span className="text-gray-600">{expense.item}</span>
+                          <span className="">{expense.item}</span>
                           <span className="font-medium text-gray-800">
                             {expense.cost_range}
                           </span>
@@ -616,7 +619,7 @@ export default async function Page({
                     <h3 className="font-medium text-gray-800 mb-2">
                       Primary Language
                     </h3>
-                    <p className="text-gray-600">
+                    <p className="">
                       {parsedData.language?.primary_language}
                     </p>
                   </div>
@@ -674,7 +677,7 @@ export default async function Page({
                             <p className="text-sm text-gray-500">
                               {event.dates}
                             </p>
-                            <p className="text-gray-600 mt-1">
+                            <p className=" mt-1">
                               {event.description}
                             </p>
                           </div>

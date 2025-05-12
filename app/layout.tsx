@@ -107,7 +107,7 @@ export default function RootLayout({
             <BgImage />
             <main className=" w-full h-screen-minus-header flex justify-center items-center">
               {/* <AnimTransition> */}
-              <div className=" w-fill h-fill px-4 md:px-36">
+              <div className=" w-fill h-fill md:px-36">
                 {children}
               </div>
               {/* </AnimTransition> */}
